@@ -17,6 +17,7 @@ RegWidget::RegWidget(QWidget *parent)
       codeFailedAttempts(0),
       codeLockLevel(0),
       codeIsLocked(false),
+      m_checkingLogin(false),
       m_verifyingCode(false)
 {
     codeLockTimer = new QTimer(this);
@@ -327,21 +328,14 @@ void RegWidget::onTogglePassword2()
 
 void RegWidget::onContinueClicked()
 {
-    loginEdit->setReadOnly(true);
-    passwordEdit->setReadOnly(true);
-    confirmPasswordEdit->setReadOnly(true);
+    // Сначала проверяем логин на сервере, переход на шаг 2 — только после ответа
+    continueBtn->setEnabled(false);
+    continueBtn->setText("Проверяем...");
+    loginErrorLabel->hide();
 
-    currentLogin = loginEdit->text().trimmed();
-
-    showStep(2);
-
-    emailEdit->clear();
-    emailErrorLabel->hide();
-    confirmEmailBtn->hide();
-    codeStatusLabel->hide();
-    codeEdit->hide();
-    codeErrorLabel->hide();
-    verifyCodeBtn->hide();
+    m_checkingLogin = true;
+    QString login = loginEdit->text().trimmed();
+    ClientSingleton::instance().sendRequestAsync(QString("check_login||%1").arg(login));
 }
 
 void RegWidget::onEmailTextChanged(const QString &text)
@@ -370,6 +364,9 @@ void RegWidget::onBackClicked()
     passwordEdit->setReadOnly(false);
     confirmPasswordEdit->setReadOnly(false);
 
+    continueBtn->setText("Продолжить");
+    validateStep1();
+
     confirmEmailBtn->setEnabled(true);
     confirmEmailBtn->setText("Подтвердить почту");
     confirmEmailBtn->setStyleSheet(
@@ -381,6 +378,7 @@ void RegWidget::onBackClicked()
     codeFailedAttempts = 0;
     codeLockLevel = 0;
     codeIsLocked = false;
+    m_checkingLogin = false;
     m_verifyingCode = false;
     if (codeLockTimer->isActive()) codeLockTimer->stop();
 
@@ -423,8 +421,40 @@ void RegWidget::onRegistrationResponseReceived(const QString &response)
     QString r = response.trimmed();
     if (r.isEmpty()) return;
 
+    // ── Ответ на check_login ──────────────────────────────────────────────────
+    if (m_checkingLogin) {
+        m_checkingLogin = false;
+        continueBtn->setText("Продолжить");
+
+        if (r == "login_free") {
+            // Логин свободен — переходим на шаг 2
+            loginEdit->setReadOnly(true);
+            passwordEdit->setReadOnly(true);
+            confirmPasswordEdit->setReadOnly(true);
+            currentLogin = loginEdit->text().trimmed();
+
+            showStep(2);
+            emailEdit->clear();
+            emailErrorLabel->hide();
+            confirmEmailBtn->hide();
+            codeStatusLabel->hide();
+            codeEdit->hide();
+            codeErrorLabel->hide();
+            verifyCodeBtn->hide();
+        } else if (r == "login_taken") {
+            loginErrorLabel->setText("Пользователь с таким логином уже существует");
+            loginErrorLabel->show();
+            validateStep1();
+        } else {
+            loginErrorLabel->setText("Ошибка соединения с сервером");
+            loginErrorLabel->show();
+            validateStep1();
+        }
+        return;
+    }
+
+    // ── Ответ на verify_reg ───────────────────────────────────────────────────
     if (m_verifyingCode) {
-        // Ответ на verify_reg
         m_verifyingCode = false;
         verifyCodeBtn->setEnabled(true);
 
@@ -463,7 +493,7 @@ void RegWidget::onRegistrationResponseReceived(const QString &response)
         return;
     }
 
-    // Ответ на registration
+    // ── Ответ на registration ─────────────────────────────────────────────────
     if (r == "reg_code_sent") {
         codeStatusLabel->setText("Код отправлен на почту");
         codeStatusLabel->setStyleSheet("QLabel { color: #388E3C; font-size: 10pt; }");

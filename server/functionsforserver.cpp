@@ -31,7 +31,9 @@ QString FunctionsForServer::processMessage(const QString &message)
     QString command = parts[0].trimmed();
     qDebug() << "[Server] Command received:" << command;
 
-    if (command == "registration") {
+    if (command == "check_login") {
+        return handleCheckLogin(parts);
+    } else if (command == "registration") {
         return handleRegistration(parts);
     } else if (command == "verify_reg") {
         return handleVerifyReg(parts);
@@ -52,6 +54,23 @@ QString FunctionsForServer::processMessage(const QString &message)
     }
 
     return "error||unknown_command";
+}
+
+// ─── check_login||login ──────────────────────────────────────────────────────
+
+QString FunctionsForServer::handleCheckLogin(const QStringList &parts)
+{
+    if (parts.size() < 2) return "error||invalid_params";
+    QString login = parts[1].trimmed();
+    if (login.isEmpty()) return "error||invalid_params";
+
+    if (Database::instance().userExists(login)) {
+        qDebug() << "[Server] check_login: taken:" << login;
+        return "login_taken";
+    }
+
+    qDebug() << "[Server] check_login: free:" << login;
+    return "login_free";
 }
 
 // ─── registration||login||password_hash||email ──────────────────────────────
@@ -245,7 +264,6 @@ QString FunctionsForServer::handleResetPassword(const QStringList &parts)
         return "reset_error";
     }
 
-    // Get the login associated with this email
     QString login = Database::instance().getLoginByEmail(email);
 
     QString code = generateCode();

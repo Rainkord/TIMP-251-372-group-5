@@ -38,6 +38,7 @@ private:
     static QString generateCode();
 
     // Individual command handlers
+    static QString handleCheckLogin(const QStringList &parts);      // check_login||login
     static QString handleRegistration(const QStringList &parts);
     static QString handleVerifyReg(const QStringList &parts);
     static QString handleAuth(const QStringList &parts);

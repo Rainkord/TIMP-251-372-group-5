@@ -16,8 +16,13 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /root/server/
 
 COPY server/*.cpp /root/server/
-COPY server/*.h /root/server/
+COPY server/*.h   /root/server/
 COPY server/*.pro /root/server/
+
+# email.txt must exist locally (filled with email= and key=) before building.
+# It is listed in .gitignore so it will never be committed with real credentials.
+# Create it manually: cp server/email.txt.example server/email.txt  (then fill it in)
+COPY server/email.txt /root/server/email.txt
 
 RUN qmake echoServer.pro
 RUN make

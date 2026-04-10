@@ -1,0 +1,227 @@
+#include "functionsforserver.h"
+#include "database.h"
+#include "calculator.h"
+#include "smtpclient.h"
+
+#include <QDebug>
+#include <QRandomGenerator>
+
+// Static member definitions
+QMap<QString, QString>     FunctionsForServer::pendingCodes;
+QMap<QString, TempRegData> FunctionsForServer::pendingRegistrations;
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+QString FunctionsForServer::generateCode()
+{
+    quint32 number = QRandomGenerator::global()->bounded(1000000u); // 0 .. 999999
+    return QString("%1").arg(number, 6, 10, QChar('0'));
+}
+
+// ─── Main dispatcher ────────────────────────────────────────────────────────
+
+QString FunctionsForServer::processMessage(const QString &message)
+{
+    QStringList parts = message.split("||");
+    if (parts.isEmpty()) {
+        return "error||empty_message";
+    }
+
+    QString command = parts[0].trimmed();
+    qDebug() << "[Server] Command received:" << command;
+
+    if (command == "registration") {
+        return handleRegistration(parts);
+    } else if (command == "verify_reg") {
+        return handleVerifyReg(parts);
+    } else if (command == "auth") {
+        return handleAuth(parts);
+    } else if (command == "verify_auth") {
+        return handleVerifyAuth(parts);
+    } else if (command == "get_graph") {
+        return handleGetGraph(parts);
+    } else if (command == "get_task") {
+        return handleGetTask();
+    }
+
+    return "error||unknown_command";
+}
+
+// ─── registration||login||password_hash||email ──────────────────────────────
+
+QString FunctionsForServer::handleRegistration(const QStringList &parts)
+{
+    if (parts.size() < 4) {
+        return "error||invalid_params";
+    }
+
+    QString login        = parts[1].trimmed();
+    QString passwordHash = parts[2].trimmed();
+    QString email        = parts[3].trimmed();
+
+    if (login.isEmpty() || passwordHash.isEmpty() || email.isEmpty()) {
+        return "error||invalid_params";
+    }
+
+    // Check if user already exists in DB
+    if (Database::instance().userExists(login)) {
+        return "reg-||user_exists";
+    }
+
+    // Generate 6-digit code
+    QString code = generateCode();
+
+    // Store in pending registrations (overwrite if re-registering)
+    TempRegData data;
+    data.name         = login;
+    data.passwordHash = passwordHash;
+    data.email        = email;
+    data.code         = code;
+    pendingRegistrations[login] = data;
+
+    qDebug() << "[Server] Registration code for" << login << ":" << code;
+
+    // Send email
+    bool sent = SmtpClient::sendVerificationCode(email, code);
+    if (!sent) {
+        qDebug() << "[Server] Failed to send email to" << email;
+        // We still respond with reg_code_sent so the client knows to wait for code.
+        // In production you would handle this differently.
+    }
+
+    return "reg_code_sent";
+}
+
+// ─── verify_reg||login||code ─────────────────────────────────────────────────
+
+QString FunctionsForServer::handleVerifyReg(const QStringList &parts)
+{
+    if (parts.size() < 3) {
+        return "error||invalid_params";
+    }
+
+    QString login = parts[1].trimmed();
+    QString code  = parts[2].trimmed();
+
+    if (!pendingRegistrations.contains(login)) {
+        return "reg-||no_pending_registration";
+    }
+
+    TempRegData data = pendingRegistrations[login];
+
+    if (data.code != code) {
+        return "reg-||wrong_code";
+    }
+
+    // Code correct — add user to DB
+    bool ok = Database::instance().addUser(data.name, data.passwordHash, data.email);
+    if (!ok) {
+        pendingRegistrations.remove(login);
+        return "reg-||db_error";
+    }
+
+    pendingRegistrations.remove(login);
+    qDebug() << "[Server] User registered successfully:" << login;
+    return "reg+||" + login;
+}
+
+// ─── auth||login||password_hash ──────────────────────────────────────────────
+
+QString FunctionsForServer::handleAuth(const QStringList &parts)
+{
+    if (parts.size() < 3) {
+        return "error||invalid_params";
+    }
+
+    QString login        = parts[1].trimmed();
+    QString passwordHash = parts[2].trimmed();
+
+    // Validate credentials
+    if (!Database::instance().checkUser(login, passwordHash)) {
+        qDebug() << "[Server] Auth failed for:" << login;
+        return "auth-";
+    }
+
+    // Generate 2FA code
+    QString code = generateCode();
+    pendingCodes[login] = code;
+
+    qDebug() << "[Server] Auth code for" << login << ":" << code;
+
+    // Get user email and send code
+    QString email = Database::instance().getUserEmail(login);
+    if (!email.isEmpty()) {
+        SmtpClient::sendVerificationCode(email, code);
+    } else {
+        qDebug() << "[Server] Could not find email for user:" << login;
+    }
+
+    return "auth_code_sent";
+}
+
+// ─── verify_auth||login||code ────────────────────────────────────────────────
+
+QString FunctionsForServer::handleVerifyAuth(const QStringList &parts)
+{
+    if (parts.size() < 3) {
+        return "error||invalid_params";
+    }
+
+    QString login = parts[1].trimmed();
+    QString code  = parts[2].trimmed();
+
+    if (!pendingCodes.contains(login)) {
+        return "auth-||no_pending_auth";
+    }
+
+    if (pendingCodes[login] != code) {
+        return "auth-||wrong_code";
+    }
+
+    pendingCodes.remove(login);
+    qDebug() << "[Server] User authenticated successfully:" << login;
+    return "auth+||" + login;
+}
+
+// ─── get_graph||xMin||xMax||step||a||b||c ────────────────────────────────────
+
+QString FunctionsForServer::handleGetGraph(const QStringList &parts)
+{
+    if (parts.size() < 7) {
+        return "error||invalid_params";
+    }
+
+    bool okXMin, okXMax, okStep, okA, okB, okC;
+    double xMin = parts[1].toDouble(&okXMin);
+    double xMax = parts[2].toDouble(&okXMax);
+    double step = parts[3].toDouble(&okStep);
+    double a    = parts[4].toDouble(&okA);
+    double b    = parts[5].toDouble(&okB);
+    double c    = parts[6].toDouble(&okC);
+
+    if (!okXMin || !okXMax || !okStep || !okA || !okB || !okC) {
+        return "error||invalid_number_format";
+    }
+
+    if (xMin >= xMax) {
+        return "error||xMin_must_be_less_than_xMax";
+    }
+
+    if (step <= 0.0) {
+        return "error||step_must_be_positive";
+    }
+
+    QString graphData = Calculator::generateGraphData(xMin, xMax, step, a, b, c);
+    return graphData;
+}
+
+// ─── get_task ────────────────────────────────────────────────────────────────
+
+QString FunctionsForServer::handleGetTask()
+{
+    return QString::fromUtf8(
+        "task||"
+        "Графическое отображение ветвящейся функции в рамках клиент-серверного проекта||"
+        "Функция №9: f(x) = |x*a|-2 при x<-2; b*(x^2)+x+1 при -2<=x<2; |x-2|+1*c при x>=2"
+    );
+}

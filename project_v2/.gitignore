@@ -1,0 +1,28 @@
+# Compiled
+*.o
+*.obj
+moc_*
+ui_*
+qrc_*
+Makefile
+echoServer
+client
+
+# Qt
+*.pro.user
+*.pro.user.*
+
+# Build directories
+build/
+debug/
+release/
+
+# Database
+*.db
+
+# Doxygen output
+docs/output/
+
+# OS
+.DS_Store
+Thumbs.db

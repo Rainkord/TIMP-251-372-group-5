@@ -109,7 +109,23 @@ QString Database::getUserEmail(const QString &name)
     return QString();
 }
 
-// ─── NEW: check if any user has this email ────────────────────────────────────
+QString Database::getLoginByEmail(const QString &email)
+{
+    QSqlQuery query(m_db);
+    query.prepare("SELECT name FROM users WHERE email = :email");
+    query.bindValue(":email", email);
+
+    if (!query.exec()) {
+        qDebug() << "[DB] getLoginByEmail query failed:" << query.lastError().text();
+        return QString();
+    }
+
+    if (query.next()) {
+        return query.value(0).toString();
+    }
+
+    return QString();
+}
 
 bool Database::emailExists(const QString &email)
 {
@@ -124,8 +140,6 @@ bool Database::emailExists(const QString &email)
 
     return query.next();
 }
-
-// ─── NEW: update password hash by email ──────────────────────────────────────
 
 bool Database::updatePasswordByEmail(const QString &email, const QString &newHash)
 {

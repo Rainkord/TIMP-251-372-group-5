@@ -32,17 +32,11 @@
 
 #define FONT_FAMILY    "Segoe UI"
 
-// Виртуальные размеры схемы (до масштабирования)
-#define SCHEMA_W  700
-#define SCHEMA_H  735
-#define SCALE     (1.0 / 1.5)
-
 // ──────────────────────────────────────────────────────────────────────────
 FlowchartWidget::FlowchartWidget(QWidget *parent)
     : QWidget(parent)
 {
-    // Размер канваса = виртуальные размеры схемы (отображается в 1.5 раза меньше через scale)
-    setFixedSize(SCHEMA_W, SCHEMA_H);
+    setFixedSize(700, 735);
 }
 
 void FlowchartWidget::drawRoundedBlock(QPainter &p, int cx, int cy, int w, int h,
@@ -126,36 +120,27 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
     p.fillRect(rect(), FC_BG);
 
-    // Схема рисуется в виртуальных координатах 700x735,
-    // затем масштабируется до 1/1.5 ≈ 467x490
-    // и центрируется через translate
-    const double sc = SCALE;
-    const double scaledW = SCHEMA_W * sc;  // ~467
-    const double scaledH = SCHEMA_H * sc;  // ~490
-    const double offX = (width()  - scaledW) / 2.0;
-    const double offY = (height() - scaledH) / 2.0;
+    // Все размеры увеличены в 1.3 раза относительно базовых:
+    // bw=200->260, bh=40->52, dw=240->312, dh=70->91, gap=18->23
+    // ширина схемы = dw/2 + 300*1.3 + bw/2 + 25 = 156 + 390 + 130 + 25 = 701
+    // при канвасе 700: centerX = 156 + (700-701)/2 ≈ 156 (marginally ok, зажмём routeX на 1px)
+    // Возьмём centerX=155, rightX=155+390=545, routeX=545+130+25=700 (вплоть к краю)
+    // Чтобы не обрезать, сдвинем всё влево на 5px: centerX=150, rightX=540, routeX=695
+    int bw = 260, bh = 52;
+    int dw = 312, dh = 91;
+    int gap = 23;
 
-    p.save();
-    p.translate(offX, offY);
-    p.scale(sc, sc);
-
-    // Все координаты ниже — в виртуальном пространстве 700x735
-    int bw = 200, bh = 40;
-    int dw = 240, dh = 70;
-    int gap = 18;
-
-    // центр основного потока: полуширина схемы влево = dw/2=120, вправо = 300+bw/2+25=425
-    // centerX = 120 + (700-545)/2 = 120+77 = 197 ≈ 200
-    int centerX = 200;
-    int rightX  = centerX + 300;
+    int centerX = 150;
+    int rightX  = centerX + 390;
     int routeX  = rightX + bw/2 + 25;
 
-    // старт сверху: высота схемы ~683, (735-683)/2 = 26
-    int y = 26;
+    // Сдвиг вниз на 150px
+    int y = 150;
 
     // 1. Начало
-    drawRoundedBlock(p, centerX, y, 140, 36, "Начало", FC_START_FILL, FC_START_BDR);
-    int y1 = y + 18; y += 36 + gap;
+    int startW = 182, startH = 47;
+    drawRoundedBlock(p, centerX, y, startW, startH, "Начало", FC_START_FILL, FC_START_BDR);
+    int y1 = y + startH/2; y += startH + gap;
     drawArrowDown(p, centerX, y1, y - bh/2);
 
     // 2. Ввод
@@ -167,32 +152,32 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     int diamondY1 = y;
     drawDiamond(p, centerX, y, dw, dh, "x < -2 ?", FC_COND_FILL, FC_COND_BDR);
     drawArrowRight(p, centerX + dw/2, rightX - bw/2, y);
-    drawText(p, centerX + dw/2 + 25, y - 12, 40, 20, "Да");
+    drawText(p, centerX + dw/2 + 25, y - 14, 40, 20, "Да");
     drawRoundedBlock(p, rightX, diamondY1, bw, bh, "f = |x·a| − 2", FC_BR1_FILL, FC_BR1_BDR);
     int rb1Bottom = diamondY1 + bh/2;
 
     y1 = y + dh/2; y += dh + gap;
     drawArrowDown(p, centerX, y1, y - dh/2);
-    drawText(p, centerX + 16, y1 + 8, 40, 20, "Нет");
+    drawText(p, centerX + 18, y1 + 10, 40, 20, "Нет");
 
     // 4. -2 ≤ x < 2 ?
     int diamondY2 = y;
     drawDiamond(p, centerX, y, dw, dh, "-2 ≤ x < 2 ?", FC_COND_FILL, FC_COND_BDR);
     drawArrowRight(p, centerX + dw/2, rightX - bw/2, y);
-    drawText(p, centerX + dw/2 + 25, y - 12, 40, 20, "Да");
+    drawText(p, centerX + dw/2 + 25, y - 14, 40, 20, "Да");
     drawRoundedBlock(p, rightX, diamondY2, bw, bh, "f = b·(x²) + x + 1", FC_BR2_FILL, FC_BR2_BDR);
     int rb2Bottom = diamondY2 + bh/2;
 
     y1 = y + dh/2; y += dh + gap;
     drawArrowDown(p, centerX, y1, y - bh/2);
-    drawText(p, centerX + 16, y1 + 8, 40, 20, "Нет");
+    drawText(p, centerX + 18, y1 + 10, 40, 20, "Нет");
 
     // 5. Ветвь 3
     int block3CenterY = y;
     drawRoundedBlock(p, centerX, block3CenterY, bw, bh, "f = |x − 2| + 1·c", FC_BR3_FILL, FC_BR3_BDR);
     int block3Bottom = block3CenterY + bh/2;
 
-    int mergeY = block3Bottom + gap + 15;
+    int mergeY = block3Bottom + gap + 20;
     drawArrowLine(p, centerX, block3Bottom, centerX, mergeY);
 
     p.setPen(QPen(FC_ARROW, 2));
@@ -209,19 +194,17 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     p.drawPolygon(arrowLeft);
     p.setBrush(Qt::NoBrush);
 
-    y = mergeY + 8;
+    y = mergeY + 10;
 
     // 6. Вывод
     drawArrowDown(p, centerX, mergeY, y + bh/2 - 4);
     y += bh/2;
     drawRoundedBlock(p, centerX, y, bw, bh, "Вывод f(x)", FC_OUT_FILL, FC_OUT_BDR);
     y1 = y + bh/2; y += bh + gap;
-    drawArrowDown(p, centerX, y1, y - 18);
+    drawArrowDown(p, centerX, y1, y - startH/2);
 
     // 7. Конец
-    drawRoundedBlock(p, centerX, y, 140, 36, "Конец", FC_START_FILL, FC_START_BDR);
-
-    p.restore();
+    drawRoundedBlock(p, centerX, y, startW, startH, "Конец", FC_START_FILL, FC_START_BDR);
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -240,16 +223,15 @@ void SchemaDialog::setupUI()
 {
     setWindowTitle("Блок-схема вычислительного процесса");
 
-    // Канвас 700x735 + отступы 16*2 + кнопка 44 = ~800x800
-    resize(800, 800);
-    setFixedSize(800, 800);
+    resize(760, 795);
+    setFixedSize(760, 795);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(16, 16, 16, 16);
     mainLayout->setSpacing(8);
 
     canvas = new FlowchartWidget(this);
-    mainLayout->addWidget(canvas, 1, Qt::AlignHCenter | Qt::AlignVCenter);
+    mainLayout->addWidget(canvas, 1, Qt::AlignHCenter | Qt::AlignTop);
 
     closeBtn = new QPushButton("Закрыть", this);
     closeBtn->setMinimumHeight(36);

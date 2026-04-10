@@ -7,6 +7,8 @@
 #include <QSpacerItem>
 #include <QFrame>
 #include <QPainter>
+#include <QPixmap>
+#include <QIcon>
 
 // ── GitHub Dark palette ──────────────────────────────────────────────────
 #define GH_BG          "#0d1117"
@@ -19,10 +21,20 @@
 #define GH_BLUE        "#388bfd"
 #define FONT_FAMILY    "Segoe UI"
 
+// Перекрашивает любую иконку Qt в нужный цвет (для тёмного топбара)
+static QIcon tintIcon(const QIcon &src, const QColor &color, int sz = 18)
+{
+    QPixmap pm = src.pixmap(sz, sz);
+    QPainter painter(&pm);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(pm.rect(), color);
+    painter.end();
+    return QIcon(pm);
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    // Глобальный фон всего окна
     setStyleSheet(QString(
         "QMainWindow { background-color: %1; }"
         "QWidget      { background-color: %1; color: %2; font-family: '%3'; }"
@@ -47,7 +59,7 @@ void MainWindow::setupUI()
     mainVLayout->setContentsMargins(0, 0, 0, 0);
     mainVLayout->setSpacing(0);
 
-    // ── Top bar ──────────────────────────────────────────────────────────
+    // ── Top bar ────────────────────────────────────────────────────────
     QWidget *topBar = new QWidget(centralWidget);
     topBar->setFixedHeight(44);
     topBar->setStyleSheet(QString(
@@ -57,23 +69,29 @@ void MainWindow::setupUI()
         "  border: 1px solid %2; border-radius: 6px;"
         "  padding: 4px 12px; font-size: 11px; font-family: '%5';"
         "}"
-        "QPushButton:hover  { background-color: %6; }"
+        "QPushButton:hover   { background-color: %6; }"
         "QPushButton:pressed { background-color: %2; }"
-    ).arg(GH_TOPBAR).arg(GH_BORDER).arg(GH_BTN_GHOST).arg(GH_TEXT).arg(FONT_FAMILY).arg(GH_BTN_GHOST_H));
+    ).arg(GH_TOPBAR).arg(GH_BORDER).arg(GH_BTN_GHOST)
+     .arg(GH_TEXT).arg(FONT_FAMILY).arg(GH_BTN_GHOST_H));
 
     topBarLayout = new QHBoxLayout(topBar);
     topBarLayout->setContentsMargins(12, 0, 12, 0);
     topBarLayout->setSpacing(6);
 
+    // ── Иконки перекрашены в светлый цвет #e6edf3
+    const QColor iconColor(0xe6, 0xed, 0xf3);
+
     taskBtn = new QPushButton(topBar);
-    taskBtn->setIcon(style()->standardIcon(QStyle::SP_FileDialogInfoView));
+    taskBtn->setIcon(tintIcon(style()->standardIcon(QStyle::SP_FileDialogInfoView), iconColor));
+    taskBtn->setIconSize(QSize(16, 16));
     taskBtn->setText("  Задание");
     taskBtn->setToolTip("Показать задание");
     taskBtn->setMinimumWidth(100);
     taskBtn->setMinimumHeight(30);
 
     schemaBtn = new QPushButton(topBar);
-    schemaBtn->setIcon(style()->standardIcon(QStyle::SP_FileDialogContentsView));
+    schemaBtn->setIcon(tintIcon(style()->standardIcon(QStyle::SP_FileDialogContentsView), iconColor));
+    schemaBtn->setIconSize(QSize(16, 16));
     schemaBtn->setText("  Блок-схема");
     schemaBtn->setToolTip("Показать блок-схему");
     schemaBtn->setMinimumWidth(110);
@@ -142,9 +160,9 @@ void MainWindow::connectSignals()
     connect(graphWidget, &GraphWidget::logout, this, &MainWindow::onLogout);
 }
 
-void MainWindow::onShowRegister()  { stackedWidget->setCurrentIndex(IDX_REG);    }
-void MainWindow::onShowAuth()      { stackedWidget->setCurrentIndex(IDX_AUTH);   }
-void MainWindow::onShowReset()     { stackedWidget->setCurrentIndex(IDX_RESET);  }
+void MainWindow::onShowRegister()  { stackedWidget->setCurrentIndex(IDX_REG);   }
+void MainWindow::onShowAuth()      { stackedWidget->setCurrentIndex(IDX_AUTH);  }
+void MainWindow::onShowReset()     { stackedWidget->setCurrentIndex(IDX_RESET); }
 
 void MainWindow::onShowVerifyAuth(const QString &login)
 {
@@ -164,14 +182,5 @@ void MainWindow::onRegistrationSuccess() { stackedWidget->setCurrentIndex(IDX_AU
 void MainWindow::onLogout()              { stackedWidget->setCurrentIndex(IDX_AUTH); }
 void MainWindow::onResetSuccess()        { stackedWidget->setCurrentIndex(IDX_AUTH); }
 
-void MainWindow::onTaskBtnClicked()
-{
-    TaskDialog dlg(this);
-    dlg.exec();
-}
-
-void MainWindow::onSchemaBtnClicked()
-{
-    SchemaDialog dlg(this);
-    dlg.exec();
-}
+void MainWindow::onTaskBtnClicked()  { TaskDialog   dlg(this); dlg.exec(); }
+void MainWindow::onSchemaBtnClicked(){ SchemaDialog dlg(this); dlg.exec(); }

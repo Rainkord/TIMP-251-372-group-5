@@ -9,25 +9,44 @@
 #include <QFont>
 #include <QPolygon>
 
-// ── GitHub Dark colours ──────────────────────────────────────────────────
-// Canvas
-#define FC_BG          QColor(0x0d, 0x11, 0x17)   // #0d1117
-#define FC_BORDER      QColor(0x30, 0x36, 0x3d)   // #30363d
-#define FC_TEXT        QColor(0xe6, 0xed, 0xf3)   // #e6edf3
-#define FC_ARROW       QColor(0x8b, 0x94, 0x9e)   // #8b949e
-#define FC_LABEL       QColor(0x8b, 0x94, 0x9e)   // #8b949e
-// Block fills
-#define FC_GREEN_FILL  QColor(0x1a, 0x35, 0x1e)   // start/end
-#define FC_BLUE_FILL   QColor(0x1a, 0x27, 0x40)   // input
-#define FC_YELLOW_FILL QColor(0x2d, 0x28, 0x12)   // diamond
-#define FC_RED_FILL    QColor(0x3a, 0x18, 0x18)   // branch 1
-#define FC_TEAL_FILL   QColor(0x12, 0x2d, 0x2a)   // branch 2
-#define FC_PURPLE_FILL QColor(0x1f, 0x1a, 0x3a)   // branch 3
-#define FC_OUT_FILL    QColor(0x1a, 0x28, 0x2d)   // output
+// ══════════════════════════════════════════════════════════════════════════
+// GitHub Dark + насыщенные акценты (по GitHub Brand Toolkit)
+// Background:  #0d1117   Border: #30363d   Text: #e6edf3
+// Green:   #238636  /  fill #0f5132
+// Blue:    #388bfd  /  fill #0d419d
+// Orange:  #d29922  /  fill #5d4300  ("diamond" — условие)
+// Red:     #f85149  /  fill #6e1a1a
+// Teal:    #39c5cf  /  fill #0e4d55
+// Purple:  #a371f7  /  fill #3d1f6e
+// Output:  #58a6ff  /  fill #0d3875
+// ══════════════════════════════════════════════════════════════════════════
+#define FC_BG          QColor(0x0d, 0x11, 0x17)
+#define FC_BORDER      QColor(0x30, 0x36, 0x3d)
+#define FC_TEXT        QColor(0xe6, 0xed, 0xf3)
+#define FC_ARROW       QColor(0x8b, 0x94, 0x9e)
+#define FC_LABEL       QColor(0xd2, 0x99, 0x22)   // оранжевый — да/нет
+
+// Заливки блоков
+#define FC_START_FILL  QColor(0x0f, 0x51, 0x32)   // тёмно-зелёный
+#define FC_INPUT_FILL  QColor(0x0d, 0x41, 0x9d)   // тёмно-синий
+#define FC_COND_FILL   QColor(0x5d, 0x43, 0x00)   // тёмно-оранжевый (ромб)
+#define FC_BR1_FILL    QColor(0x6e, 0x1a, 0x1a)   // тёмно-красный
+#define FC_BR2_FILL    QColor(0x0e, 0x4d, 0x55)   // тёмно-бирюзовый
+#define FC_BR3_FILL    QColor(0x3d, 0x1f, 0x6e)   // тёмно-фиолетовый
+#define FC_OUT_FILL    QColor(0x0d, 0x38, 0x75)   // тёмно-синий (вывод)
+
+// Контуры блоков (насыщеннее бордера)
+#define FC_START_BDR   QColor(0x23, 0x86, 0x36)   // зелёный
+#define FC_INPUT_BDR   QColor(0x38, 0x8b, 0xfd)   // синий
+#define FC_COND_BDR    QColor(0xd2, 0x99, 0x22)   // оранжевый
+#define FC_BR1_BDR     QColor(0xf8, 0x51, 0x49)   // красный
+#define FC_BR2_BDR     QColor(0x39, 0xc5, 0xcf)   // бирюзовый
+#define FC_BR3_BDR     QColor(0xa3, 0x71, 0xf7)   // фиолетовый
+#define FC_OUT_BDR     QColor(0x58, 0xa6, 0xff)   // голубой
 
 #define FONT_FAMILY    "Segoe UI"
 
-// ───────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
 FlowchartWidget::FlowchartWidget(QWidget *parent)
     : QWidget(parent)
 {
@@ -35,13 +54,14 @@ FlowchartWidget::FlowchartWidget(QWidget *parent)
 }
 
 void FlowchartWidget::drawRoundedBlock(QPainter &p, int cx, int cy, int w, int h,
-                                        const QString &text, const QColor &fill)
+                                        const QString &text,
+                                        const QColor &fill, const QColor &border)
 {
     QRect rect(cx - w/2, cy - h/2, w, h);
     QPainterPath path;
     path.addRoundedRect(rect, 10, 10);
     p.fillPath(path, fill);
-    p.setPen(QPen(FC_BORDER, 1.5));
+    p.setPen(QPen(border, 1.5));
     p.drawPath(path);
     p.setPen(FC_TEXT);
     QFont f(FONT_FAMILY, 10);
@@ -50,18 +70,19 @@ void FlowchartWidget::drawRoundedBlock(QPainter &p, int cx, int cy, int w, int h
 }
 
 void FlowchartWidget::drawDiamond(QPainter &p, int cx, int cy, int w, int h,
-                                   const QString &text, const QColor &fill)
+                                   const QString &text,
+                                   const QColor &fill, const QColor &border)
 {
     QPolygon diamond;
-    diamond << QPoint(cx, cy - h/2)
+    diamond << QPoint(cx,       cy - h/2)
             << QPoint(cx + w/2, cy)
-            << QPoint(cx, cy + h/2)
+            << QPoint(cx,       cy + h/2)
             << QPoint(cx - w/2, cy);
     QPainterPath path;
     path.addPolygon(diamond);
     path.closeSubpath();
     p.fillPath(path, fill);
-    p.setPen(QPen(FC_BORDER, 1.5));
+    p.setPen(QPen(border, 1.5));
     p.drawPath(path);
     p.setPen(FC_TEXT);
     QFont f(FONT_FAMILY, 9);
@@ -74,10 +95,10 @@ void FlowchartWidget::drawArrowDown(QPainter &p, int cx, int y1, int y2)
 {
     p.setPen(QPen(FC_ARROW, 2));
     p.drawLine(cx, y1, cx, y2);
-    QPolygon arrow;
-    arrow << QPoint(cx, y2) << QPoint(cx-6, y2-10) << QPoint(cx+6, y2-10);
+    QPolygon arr;
+    arr << QPoint(cx, y2) << QPoint(cx-6, y2-10) << QPoint(cx+6, y2-10);
     p.setBrush(FC_ARROW);
-    p.drawPolygon(arrow);
+    p.drawPolygon(arr);
     p.setBrush(Qt::NoBrush);
 }
 
@@ -85,10 +106,10 @@ void FlowchartWidget::drawArrowRight(QPainter &p, int x1, int x2, int y)
 {
     p.setPen(QPen(FC_ARROW, 2));
     p.drawLine(x1, y, x2, y);
-    QPolygon arrow;
-    arrow << QPoint(x2, y) << QPoint(x2-10, y-6) << QPoint(x2-10, y+6);
+    QPolygon arr;
+    arr << QPoint(x2, y) << QPoint(x2-10, y-6) << QPoint(x2-10, y+6);
     p.setBrush(FC_ARROW);
-    p.drawPolygon(arrow);
+    p.drawPolygon(arr);
     p.setBrush(Qt::NoBrush);
 }
 
@@ -101,21 +122,16 @@ void FlowchartWidget::drawArrowLine(QPainter &p, int x1, int y1, int x2, int y2)
 void FlowchartWidget::drawText(QPainter &p, int cx, int cy, int w, int h, const QString &text)
 {
     QRect rect(cx - w/2, cy - h/2, w, h);
-    QFont f(FONT_FAMILY, 9);
-    f.setBold(true);
+    QFont f(FONT_FAMILY, 9, QFont::Bold);
     p.setFont(f);
-    p.setPen(FC_LABEL);
+    p.setPen(FC_LABEL);   // оранжевый цвет меток «Да»/«Нет»
     p.drawText(rect, Qt::AlignCenter, text);
-    f.setBold(false);
-    p.setFont(f);
 }
 
 void FlowchartWidget::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
-
-    // Тёмный фон
     p.fillRect(rect(), FC_BG);
 
     int centerX = 220;
@@ -127,53 +143,48 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     int y = 40;
 
     // 1. Начало
-    drawRoundedBlock(p, centerX, y, 140, 40, "Начало", FC_GREEN_FILL);
-    int y1 = y + 20;
-    y += 40 + gap;
+    drawRoundedBlock(p, centerX, y, 140, 40, "Начало", FC_START_FILL, FC_START_BDR);
+    int y1 = y + 20; y += 40 + gap;
     drawArrowDown(p, centerX, y1, y - bh/2);
 
     // 2. Ввод
-    drawRoundedBlock(p, centerX, y, bw, bh, "Ввод x, a, b, c", FC_BLUE_FILL);
-    y1 = y + bh/2;
-    y += bh + gap;
+    drawRoundedBlock(p, centerX, y, bw, bh, "Ввод x, a, b, c", FC_INPUT_FILL, FC_INPUT_BDR);
+    y1 = y + bh/2; y += bh + gap;
     drawArrowDown(p, centerX, y1, y - dh/2);
 
     // 3. x < -2 ?
     int diamondY1 = y;
-    drawDiamond(p, centerX, y, dw, dh, "x < -2 ?", FC_YELLOW_FILL);
+    drawDiamond(p, centerX, y, dw, dh, "x < -2 ?", FC_COND_FILL, FC_COND_BDR);
     drawArrowRight(p, centerX + dw/2, rightX - bw/2, y);
     drawText(p, centerX + dw/2 + 25, y - 14, 40, 20, "Да");
     int rb1CenterY = diamondY1;
-    drawRoundedBlock(p, rightX, rb1CenterY, bw, bh, "f = |x\u00B7a| \u2212 2", FC_RED_FILL);
+    drawRoundedBlock(p, rightX, rb1CenterY, bw, bh, "f = |x\u00B7a| \u2212 2", FC_BR1_FILL, FC_BR1_BDR);
     int rb1Bottom = rb1CenterY + bh/2;
 
-    y1 = y + dh/2;
-    y += dh + gap;
+    y1 = y + dh/2; y += dh + gap;
     drawArrowDown(p, centerX, y1, y - dh/2);
     drawText(p, centerX + 16, y1 + 10, 40, 20, "Нет");
 
     // 4. -2 ≤ x < 2 ?
     int diamondY2 = y;
-    drawDiamond(p, centerX, y, dw, dh, "-2 \u2264 x < 2 ?", FC_YELLOW_FILL);
+    drawDiamond(p, centerX, y, dw, dh, "-2 \u2264 x < 2 ?", FC_COND_FILL, FC_COND_BDR);
     drawArrowRight(p, centerX + dw/2, rightX - bw/2, y);
     drawText(p, centerX + dw/2 + 25, y - 14, 40, 20, "Да");
     int rb2CenterY = diamondY2;
-    drawRoundedBlock(p, rightX, rb2CenterY, bw, bh, "f = b\u00B7(x\u00B2) + x + 1", FC_TEAL_FILL);
+    drawRoundedBlock(p, rightX, rb2CenterY, bw, bh, "f = b\u00B7(x\u00B2) + x + 1", FC_BR2_FILL, FC_BR2_BDR);
     int rb2Bottom = rb2CenterY + bh/2;
 
-    y1 = y + dh/2;
-    y += dh + gap;
+    y1 = y + dh/2; y += dh + gap;
     drawArrowDown(p, centerX, y1, y - bh/2);
     drawText(p, centerX + 16, y1 + 10, 40, 20, "Нет");
 
     // 5. Ветвь 3
     int block3CenterY = y;
-    drawRoundedBlock(p, centerX, block3CenterY, bw, bh, "f = |x \u2212 2| + 1\u00B7c", FC_PURPLE_FILL);
+    drawRoundedBlock(p, centerX, block3CenterY, bw, bh, "f = |x \u2212 2| + 1\u00B7c", FC_BR3_FILL, FC_BR3_BDR);
     int block3Bottom = block3CenterY + bh/2;
 
     // Точка слияния
     int mergeY = block3Bottom + gap + 20;
-
     drawArrowLine(p, centerX, block3Bottom, centerX, mergeY);
 
     p.setPen(QPen(FC_ARROW, 2));
@@ -195,24 +206,23 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     // 6. Вывод
     drawArrowDown(p, centerX, mergeY, y + bh/2 - 5);
     y += bh/2;
-    drawRoundedBlock(p, centerX, y, bw, bh, "Вывод f(x)", FC_OUT_FILL);
-    y1 = y + bh/2;
-    y += bh + gap;
+    drawRoundedBlock(p, centerX, y, bw, bh, "Вывод f(x)", FC_OUT_FILL, FC_OUT_BDR);
+    y1 = y + bh/2; y += bh + gap;
     drawArrowDown(p, centerX, y1, y - 20);
 
     // 7. Конец
-    drawRoundedBlock(p, centerX, y, 140, 40, "Конец", FC_GREEN_FILL);
+    drawRoundedBlock(p, centerX, y, 140, 40, "Конец", FC_START_FILL, FC_START_BDR);
 }
 
-// ───────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
 SchemaDialog::SchemaDialog(QWidget *parent)
     : QDialog(parent)
 {
     setStyleSheet(QString(
-        "QDialog { background-color: #0d1117; color: #e6edf3; font-family: '%1'; }"
+        "QDialog     { background-color: #0d1117; color: #e6edf3; font-family: '%1'; }"
         "QScrollArea { background: #0d1117; border: 1px solid #30363d; border-radius: 4px; }"
         "QScrollBar:vertical   { background: #0d1117; width: 8px; border: none; }"
-        "QScrollBar::handle:vertical { background: #30363d; border-radius: 4px; }"
+        "QScrollBar::handle:vertical   { background: #30363d; border-radius: 4px; }"
         "QScrollBar:horizontal { background: #0d1117; height: 8px; border: none; }"
         "QScrollBar::handle:horizontal { background: #30363d; border-radius: 4px; }"
     ).arg(FONT_FAMILY));

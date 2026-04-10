@@ -3,9 +3,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFrame>
-#include <QScrollArea>
 
-// ── GitHub Dark palette ──────────────────────────────────────────────────
 #define GH_BG          "#0d1117"
 #define GH_CARD        "#161b22"
 #define GH_BORDER      "#30363d"
@@ -19,14 +17,9 @@ TaskDialog::TaskDialog(QWidget *parent)
     : QDialog(parent)
 {
     setStyleSheet(QString(
-        "QDialog      { background-color: %1; color: %2; font-family: '%3'; font-size: 10pt; }"
-        "QScrollArea  { background: %1; border: none; }"
-        "QWidget#scrollContent { background: %1; }"
-        "QLabel       { background: transparent; color: %2; }"
-        "QScrollBar:vertical          { background: %1; width: 8px;  border: none; }"
-        "QScrollBar::handle:vertical  { background: %4; border-radius: 4px; min-height: 20px; }"
-        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }"
-    ).arg(GH_BG).arg(GH_TEXT).arg(FONT_FAMILY).arg(GH_BORDER));
+        "QDialog { background-color: %1; color: %2; font-family: '%3'; font-size: 10pt; }"
+        "QLabel  { background: transparent; color: %2; }"
+    ).arg(GH_BG).arg(GH_TEXT).arg(FONT_FAMILY));
     setupUI();
 }
 
@@ -35,33 +28,16 @@ TaskDialog::~TaskDialog() {}
 void TaskDialog::setupUI()
 {
     setWindowTitle("Задание — Подгруппа 5");
-    // Немного увеличен размер, чтобы все элементы помещались без скролла
-    resize(560, 660);
-    setMinimumSize(460, 520);
+    // Высота увеличена, чтобы всё помещалось без скролла
+    resize(560, 720);
+    setFixedSize(560, 720);
 
-    // ── Outer layout: scroll area + кнопка снизу ───────────────────────────
-    QVBoxLayout *outerLayout = new QVBoxLayout(this);
-    outerLayout->setContentsMargins(0, 0, 0, 12);
-    outerLayout->setSpacing(0);
-
-    // ── Scroll area ──────────────────────────────────────────────────────
-    QScrollArea *scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
-    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scroll->setFrameShape(QFrame::NoFrame);
-
-    QWidget *content = new QWidget();
-    content->setObjectName("scrollContent");
-    scroll->setWidget(content);
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(content);
-    mainLayout->setContentsMargins(20, 20, 20, 20);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(24, 24, 24, 20);
     mainLayout->setSpacing(12);
 
-    // ── Separator helper ───────────────────────────────────────────────
     auto makeSep = [&]() {
-        QFrame *sep = new QFrame(content);
+        QFrame *sep = new QFrame(this);
         sep->setFrameShape(QFrame::HLine);
         sep->setStyleSheet(QString(
             "QFrame { background: %1; border: none; max-height: 1px; }"
@@ -69,8 +45,8 @@ void TaskDialog::setupUI()
         return sep;
     };
 
-    // ── Title ──────────────────────────────────────────────────────────
-    titleLabel = new QLabel(content);
+    // ── Title
+    titleLabel = new QLabel(this);
     titleLabel->setText(QString(
         "<b style='font-size:16pt; color:%1;'>Задание</b>"
     ).arg(GH_TEXT));
@@ -80,8 +56,8 @@ void TaskDialog::setupUI()
 
     mainLayout->addWidget(makeSep());
 
-    // ── Work title ──────────────────────────────────────────────────
-    workTitleLabel = new QLabel(content);
+    // ── Work title
+    workTitleLabel = new QLabel(this);
     workTitleLabel->setText(QString(
         "<p style='font-size:12pt; font-weight:bold; color:%1; text-align:center;'>"
         "Графическое отображение ветвящейся функции<br>"
@@ -93,8 +69,8 @@ void TaskDialog::setupUI()
     workTitleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(workTitleLabel);
 
-    // ── Group ────────────────────────────────────────────────────────────
-    groupLabel = new QLabel(content);
+    // ── Group
+    groupLabel = new QLabel(this);
     groupLabel->setText(QString(
         "<p style='font-size:11pt; color:%1; text-align:center;'><b>Подгруппа 5</b></p>"
     ).arg(GH_MUTED));
@@ -102,8 +78,8 @@ void TaskDialog::setupUI()
     groupLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(groupLabel);
 
-    // ── Members card ──────────────────────────────────────────────────
-    membersLabel = new QLabel(content);
+    // ── Members card
+    membersLabel = new QLabel(this);
     membersLabel->setText(QString(
         "<p style='font-size:10pt; color:%1; line-height:1.9;'>"
         "<b style='color:%2; font-size:11pt;'>Участники:</b><br><br>"
@@ -118,19 +94,14 @@ void TaskDialog::setupUI()
     membersLabel->setWordWrap(true);
     membersLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     membersLabel->setStyleSheet(QString(
-        "QLabel {"
-        "  background-color: %1;"
-        "  border: 1px solid %2;"
-        "  border-radius: 8px;"
-        "  padding: 14px 16px;"
-        "}"
+        "QLabel { background-color: %1; border: 1px solid %2; border-radius: 8px; padding: 14px 16px; }"
     ).arg(GH_CARD).arg(GH_BORDER));
     mainLayout->addWidget(membersLabel);
 
     mainLayout->addWidget(makeSep());
 
-    // ── Formula card ───────────────────────────────────────────────────
-    formulaLabel = new QLabel(content);
+    // ── Formula card
+    formulaLabel = new QLabel(this);
     formulaLabel->setText(
         "<p style='font-size:10pt; margin:0; line-height:2.0;'>"
         "<b style='color:#e6edf3; font-size:11pt;'>Функция &numero;9:</b><br><br>"
@@ -142,23 +113,14 @@ void TaskDialog::setupUI()
     formulaLabel->setTextFormat(Qt::RichText);
     formulaLabel->setWordWrap(true);
     formulaLabel->setStyleSheet(QString(
-        "QLabel {"
-        "  background-color: %1;"
-        "  border: 1px solid %2;"
-        "  border-radius: 8px;"
-        "  padding: 14px 16px;"
-        "}"
+        "QLabel { background-color: %1; border: 1px solid %2; border-radius: 8px; padding: 14px 16px; }"
     ).arg(GH_BG).arg(GH_BORDER));
     formulaLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     mainLayout->addWidget(formulaLabel);
 
     mainLayout->addStretch(1);
-    content->setLayout(mainLayout);
 
-    // ── Assemble outer layout ──────────────────────────────────────────────
-    outerLayout->addWidget(scroll, 1);
-
-    // ── Close button (вне scroll, всегда видна) ──────────────────────────
+    // ── Close button
     closeBtn = new QPushButton("Закрыть", this);
     closeBtn->setMinimumHeight(36);
     closeBtn->setStyleSheet(QString(
@@ -169,14 +131,12 @@ void TaskDialog::setupUI()
         "}"
         "QPushButton:hover { background-color: %2; }"
     ).arg(GH_BLUE).arg(GH_BLUE_H).arg(FONT_FAMILY));
-
     QHBoxLayout *btnRow = new QHBoxLayout();
-    btnRow->setContentsMargins(20, 0, 20, 0);
     btnRow->addStretch(1);
     btnRow->addWidget(closeBtn);
     btnRow->addStretch(1);
-    outerLayout->addLayout(btnRow);
+    mainLayout->addLayout(btnRow);
 
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
-    setLayout(outerLayout);
+    setLayout(mainLayout);
 }

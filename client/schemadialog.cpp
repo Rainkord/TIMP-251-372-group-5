@@ -4,45 +4,31 @@
 #include <QHBoxLayout>
 #include <QPainter>
 #include <QPainterPath>
-#include <QScrollArea>
 #include <QPen>
 #include <QFont>
 #include <QPolygon>
 
-// ══════════════════════════════════════════════════════════════════════════
-// GitHub Dark + насыщенные акценты (по GitHub Brand Toolkit)
-// Background:  #0d1117   Border: #30363d   Text: #e6edf3
-// Green:   #238636  /  fill #0f5132
-// Blue:    #388bfd  /  fill #0d419d
-// Orange:  #d29922  /  fill #5d4300  ("diamond" — условие)
-// Red:     #f85149  /  fill #6e1a1a
-// Teal:    #39c5cf  /  fill #0e4d55
-// Purple:  #a371f7  /  fill #3d1f6e
-// Output:  #58a6ff  /  fill #0d3875
-// ══════════════════════════════════════════════════════════════════════════
 #define FC_BG          QColor(0x0d, 0x11, 0x17)
 #define FC_BORDER      QColor(0x30, 0x36, 0x3d)
 #define FC_TEXT        QColor(0xe6, 0xed, 0xf3)
 #define FC_ARROW       QColor(0x8b, 0x94, 0x9e)
-#define FC_LABEL       QColor(0xd2, 0x99, 0x22)   // оранжевый — да/нет
+#define FC_LABEL       QColor(0xd2, 0x99, 0x22)
 
-// Заливки блоков
-#define FC_START_FILL  QColor(0x0f, 0x51, 0x32)   // тёмно-зелёный
-#define FC_INPUT_FILL  QColor(0x0d, 0x41, 0x9d)   // тёмно-синий
-#define FC_COND_FILL   QColor(0x5d, 0x43, 0x00)   // тёмно-оранжевый (ромб)
-#define FC_BR1_FILL    QColor(0x6e, 0x1a, 0x1a)   // тёмно-красный
-#define FC_BR2_FILL    QColor(0x0e, 0x4d, 0x55)   // тёмно-бирюзовый
-#define FC_BR3_FILL    QColor(0x3d, 0x1f, 0x6e)   // тёмно-фиолетовый
-#define FC_OUT_FILL    QColor(0x0d, 0x38, 0x75)   // тёмно-синий (вывод)
+#define FC_START_FILL  QColor(0x0f, 0x51, 0x32)
+#define FC_INPUT_FILL  QColor(0x0d, 0x41, 0x9d)
+#define FC_COND_FILL   QColor(0x5d, 0x43, 0x00)
+#define FC_BR1_FILL    QColor(0x6e, 0x1a, 0x1a)
+#define FC_BR2_FILL    QColor(0x0e, 0x4d, 0x55)
+#define FC_BR3_FILL    QColor(0x3d, 0x1f, 0x6e)
+#define FC_OUT_FILL    QColor(0x0d, 0x38, 0x75)
 
-// Контуры блоков (насыщеннее бордера)
-#define FC_START_BDR   QColor(0x23, 0x86, 0x36)   // зелёный
-#define FC_INPUT_BDR   QColor(0x38, 0x8b, 0xfd)   // синий
-#define FC_COND_BDR    QColor(0xd2, 0x99, 0x22)   // оранжевый
-#define FC_BR1_BDR     QColor(0xf8, 0x51, 0x49)   // красный
-#define FC_BR2_BDR     QColor(0x39, 0xc5, 0xcf)   // бирюзовый
-#define FC_BR3_BDR     QColor(0xa3, 0x71, 0xf7)   // фиолетовый
-#define FC_OUT_BDR     QColor(0x58, 0xa6, 0xff)   // голубой
+#define FC_START_BDR   QColor(0x23, 0x86, 0x36)
+#define FC_INPUT_BDR   QColor(0x38, 0x8b, 0xfd)
+#define FC_COND_BDR    QColor(0xd2, 0x99, 0x22)
+#define FC_BR1_BDR     QColor(0xf8, 0x51, 0x49)
+#define FC_BR2_BDR     QColor(0x39, 0xc5, 0xcf)
+#define FC_BR3_BDR     QColor(0xa3, 0x71, 0xf7)
+#define FC_OUT_BDR     QColor(0x58, 0xa6, 0xff)
 
 #define FONT_FAMILY    "Segoe UI"
 
@@ -50,7 +36,8 @@
 FlowchartWidget::FlowchartWidget(QWidget *parent)
     : QWidget(parent)
 {
-    setFixedSize(700, 1000);
+    // Размер канваса = размер диалога (700x750), блок-схема отцентрирована
+    setFixedSize(700, 980);
 }
 
 void FlowchartWidget::drawRoundedBlock(QPainter &p, int cx, int cy, int w, int h,
@@ -124,7 +111,7 @@ void FlowchartWidget::drawText(QPainter &p, int cx, int cy, int w, int h, const 
     QRect rect(cx - w/2, cy - h/2, w, h);
     QFont f(FONT_FAMILY, 9, QFont::Bold);
     p.setFont(f);
-    p.setPen(FC_LABEL);   // оранжевый цвет меток «Да»/«Нет»
+    p.setPen(FC_LABEL);
     p.drawText(rect, Qt::AlignCenter, text);
 }
 
@@ -134,8 +121,9 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
     p.fillRect(rect(), FC_BG);
 
-    int centerX = 220;
-    int rightX  = 520;
+    // Сдвигаем начальную точку по X, чтобы схема была по центру канваса
+    int centerX = width() / 2 - 130;   // центр основного потока
+    int rightX  = centerX + 300;        // правые блоки ветвлений
     int bw = 200, bh = 45;
     int dw = 240, dh = 80;
     int gap = 30;
@@ -157,9 +145,8 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     drawDiamond(p, centerX, y, dw, dh, "x < -2 ?", FC_COND_FILL, FC_COND_BDR);
     drawArrowRight(p, centerX + dw/2, rightX - bw/2, y);
     drawText(p, centerX + dw/2 + 25, y - 14, 40, 20, "Да");
-    int rb1CenterY = diamondY1;
-    drawRoundedBlock(p, rightX, rb1CenterY, bw, bh, "f = |x\u00B7a| \u2212 2", FC_BR1_FILL, FC_BR1_BDR);
-    int rb1Bottom = rb1CenterY + bh/2;
+    drawRoundedBlock(p, rightX, diamondY1, bw, bh, "f = |x·a| − 2", FC_BR1_FILL, FC_BR1_BDR);
+    int rb1Bottom = diamondY1 + bh/2;
 
     y1 = y + dh/2; y += dh + gap;
     drawArrowDown(p, centerX, y1, y - dh/2);
@@ -167,12 +154,11 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
 
     // 4. -2 ≤ x < 2 ?
     int diamondY2 = y;
-    drawDiamond(p, centerX, y, dw, dh, "-2 \u2264 x < 2 ?", FC_COND_FILL, FC_COND_BDR);
+    drawDiamond(p, centerX, y, dw, dh, "-2 ≤ x < 2 ?", FC_COND_FILL, FC_COND_BDR);
     drawArrowRight(p, centerX + dw/2, rightX - bw/2, y);
     drawText(p, centerX + dw/2 + 25, y - 14, 40, 20, "Да");
-    int rb2CenterY = diamondY2;
-    drawRoundedBlock(p, rightX, rb2CenterY, bw, bh, "f = b\u00B7(x\u00B2) + x + 1", FC_BR2_FILL, FC_BR2_BDR);
-    int rb2Bottom = rb2CenterY + bh/2;
+    drawRoundedBlock(p, rightX, diamondY2, bw, bh, "f = b·(x²) + x + 1", FC_BR2_FILL, FC_BR2_BDR);
+    int rb2Bottom = diamondY2 + bh/2;
 
     y1 = y + dh/2; y += dh + gap;
     drawArrowDown(p, centerX, y1, y - bh/2);
@@ -180,10 +166,9 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
 
     // 5. Ветвь 3
     int block3CenterY = y;
-    drawRoundedBlock(p, centerX, block3CenterY, bw, bh, "f = |x \u2212 2| + 1\u00B7c", FC_BR3_FILL, FC_BR3_BDR);
+    drawRoundedBlock(p, centerX, block3CenterY, bw, bh, "f = |x − 2| + 1·c", FC_BR3_FILL, FC_BR3_BDR);
     int block3Bottom = block3CenterY + bh/2;
 
-    // Точка слияния
     int mergeY = block3Bottom + gap + 20;
     drawArrowLine(p, centerX, block3Bottom, centerX, mergeY);
 
@@ -219,12 +204,7 @@ SchemaDialog::SchemaDialog(QWidget *parent)
     : QDialog(parent)
 {
     setStyleSheet(QString(
-        "QDialog     { background-color: #0d1117; color: #e6edf3; font-family: '%1'; }"
-        "QScrollArea { background: #0d1117; border: 1px solid #30363d; border-radius: 4px; }"
-        "QScrollBar:vertical   { background: #0d1117; width: 8px; border: none; }"
-        "QScrollBar::handle:vertical   { background: #30363d; border-radius: 4px; }"
-        "QScrollBar:horizontal { background: #0d1117; height: 8px; border: none; }"
-        "QScrollBar::handle:horizontal { background: #30363d; border-radius: 4px; }"
+        "QDialog { background-color: #0d1117; color: #e6edf3; font-family: '%1'; }"
     ).arg(FONT_FAMILY));
     setupUI();
 }
@@ -234,20 +214,18 @@ SchemaDialog::~SchemaDialog() {}
 void SchemaDialog::setupUI()
 {
     setWindowTitle("Блок-схема вычислительного процесса");
-    resize(750, 750);
-    setMinimumSize(500, 400);
+
+    // Размер диалога = размер канваса + отступы + кнопка
+    resize(760, 1060);
+    setFixedSize(760, 1060);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(8, 8, 8, 8);
-    mainLayout->setSpacing(6);
+    mainLayout->setContentsMargins(16, 16, 16, 16);
+    mainLayout->setSpacing(8);
 
-    canvas = new FlowchartWidget();
-
-    scrollArea = new QScrollArea(this);
-    scrollArea->setWidget(canvas);
-    scrollArea->setWidgetResizable(false);
-    scrollArea->setAlignment(Qt::AlignCenter);
-    mainLayout->addWidget(scrollArea, 1);
+    // Канвас без QScrollArea — просто центрируем
+    canvas = new FlowchartWidget(this);
+    mainLayout->addWidget(canvas, 1, Qt::AlignHCenter | Qt::AlignTop);
 
     closeBtn = new QPushButton("Закрыть", this);
     closeBtn->setMinimumHeight(36);

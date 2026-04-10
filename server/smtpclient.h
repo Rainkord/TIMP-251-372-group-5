@@ -7,8 +7,8 @@ class SmtpClient
 {
 public:
     static bool sendVerificationCode(const QString &toEmail, const QString &code);
+    static bool sendPasswordResetCode(const QString &toEmail, const QString &login, const QString &code);
 
-private:
     static const QString smtpHost;
     static const int smtpPort;
     static const QString senderEmail;

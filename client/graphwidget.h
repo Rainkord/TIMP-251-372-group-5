@@ -41,8 +41,6 @@ private slots:
 
 private:
     // === Left panel widgets ===
-    QPushButton    *taskBtn;
-    QPushButton    *schemaBtn;
     QLabel         *formulaLabel;
 
     QLabel         *labelA;

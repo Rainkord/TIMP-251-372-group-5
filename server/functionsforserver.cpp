@@ -9,6 +9,7 @@
 // Static member definitions
 QMap<QString, QString>     FunctionsForServer::pendingCodes;
 QMap<QString, TempRegData> FunctionsForServer::pendingRegistrations;
+QMap<QString, TempResetData> FunctionsForServer::pendingResets;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,12 @@ QString FunctionsForServer::processMessage(const QString &message)
         return handleGetGraph(parts);
     } else if (command == "get_task") {
         return handleGetTask();
+    } else if (command == "reset_password") {
+        return handleResetPassword(parts);
+    } else if (command == "verify_reset") {
+        return handleVerifyReset(parts);
+    } else if (command == "set_new_password") {
+        return handleSetNewPassword(parts);
     }
 
     return "error||unknown_command";
@@ -85,8 +92,6 @@ QString FunctionsForServer::handleRegistration(const QStringList &parts)
     bool sent = SmtpClient::sendVerificationCode(email, code);
     if (!sent) {
         qDebug() << "[Server] Failed to send email to" << email;
-        // We still respond with reg_code_sent so the client knows to wait for code.
-        // In production you would handle this differently.
     }
 
     return "reg_code_sent";
@@ -224,4 +229,93 @@ QString FunctionsForServer::handleGetTask()
         "Графическое отображение ветвящейся функции в рамках клиент-серверного проекта||"
         "Функция №9: f(x) = |x*a|-2 при x<-2; b*(x^2)+x+1 при -2<=x<2; |x-2|+1*c при x>=2"
     );
+}
+
+// ─── reset_password||email ───────────────────────────────────────────────────
+
+QString FunctionsForServer::handleResetPassword(const QStringList &parts)
+{
+    if (parts.size() < 2) {
+        return "error||invalid_params";
+    }
+
+    QString email = parts[1].trimmed();
+    if (email.isEmpty()) {
+        return "error||invalid_params";
+    }
+
+    // Check that a user with this email exists
+    if (!Database::instance().emailExists(email)) {
+        qDebug() << "[Server] reset_password: email not found:" << email;
+        return "reset_error";
+    }
+
+    QString code = generateCode();
+
+    TempResetData data;
+    data.email = email;
+    data.code  = code;
+    pendingResets[email] = data;
+
+    qDebug() << "[Server] Password reset code for" << email << ":" << code;
+
+    bool sent = SmtpClient::sendVerificationCode(email, code);
+    if (!sent) {
+        qDebug() << "[Server] Failed to send reset email to" << email;
+    }
+
+    return "reset_code_sent";
+}
+
+// ─── verify_reset||email||code ───────────────────────────────────────────────
+
+QString FunctionsForServer::handleVerifyReset(const QStringList &parts)
+{
+    if (parts.size() < 3) {
+        return "error||invalid_params";
+    }
+
+    QString email = parts[1].trimmed();
+    QString code  = parts[2].trimmed();
+
+    if (!pendingResets.contains(email)) {
+        return "reset_code_fail";
+    }
+
+    if (pendingResets[email].code != code) {
+        qDebug() << "[Server] verify_reset: wrong code for" << email;
+        return "reset_code_fail";
+    }
+
+    qDebug() << "[Server] verify_reset: code correct for" << email;
+    return "reset_code_ok";
+}
+
+// ─── set_new_password||email||code||hash ─────────────────────────────────────
+
+QString FunctionsForServer::handleSetNewPassword(const QStringList &parts)
+{
+    if (parts.size() < 4) {
+        return "error||invalid_params";
+    }
+
+    QString email        = parts[1].trimmed();
+    QString code         = parts[2].trimmed();
+    QString passwordHash = parts[3].trimmed();
+
+    // Re-verify code to prevent bypassing step 2
+    if (!pendingResets.contains(email) || pendingResets[email].code != code) {
+        qDebug() << "[Server] set_new_password: invalid or expired code for" << email;
+        return "reset_error";
+    }
+
+    bool ok = Database::instance().updatePasswordByEmail(email, passwordHash);
+    if (!ok) {
+        qDebug() << "[Server] set_new_password: DB update failed for" << email;
+        return "reset_error";
+    }
+
+    pendingResets.remove(email);
+    qDebug() << "[Server] Password changed successfully for" << email;
+    return "password_changed";
 }

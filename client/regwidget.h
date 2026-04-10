@@ -66,6 +66,7 @@ private:
     QTimer  *codeLockTimer;
     bool    codeIsLocked;
     bool    m_verifyingCode;
+    bool    m_checkingLogin;   // true while waiting for login-availability response
     QString currentLogin;
 
     void setupUI();

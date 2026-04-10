@@ -46,7 +46,6 @@ void GraphWidget::setupUI()
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
-    // Build left panel
     leftPanel = new QWidget(this);
     leftPanel->setFixedWidth(LEFT_PANEL_WIDTH);
     leftPanel->setObjectName("leftPanel");
@@ -56,8 +55,6 @@ void GraphWidget::setupUI()
     setupLeftPanel();
 
     mainLayout->addWidget(leftPanel);
-    // The right area is this widget's remaining space, painted in paintEvent
-    // We add a spacer/stretch so the left panel stays fixed
     mainLayout->addStretch(1);
 
     setLayout(mainLayout);
@@ -69,35 +66,6 @@ void GraphWidget::setupLeftPanel()
     QVBoxLayout *vbox = new QVBoxLayout(leftPanel);
     vbox->setContentsMargins(8, 8, 8, 8);
     vbox->setSpacing(6);
-
-    // ── Top row: task + schema buttons ──────────
-    QHBoxLayout *btnRow = new QHBoxLayout();
-    btnRow->setSpacing(6);
-
-    taskBtn = new QPushButton(leftPanel);
-    taskBtn->setIcon(style()->standardIcon(QStyle::SP_FileDialogInfoView));
-    taskBtn->setText(" Задание");
-    taskBtn->setToolTip("Задание");
-    taskBtn->setMinimumHeight(32);
-
-    schemaBtn = new QPushButton(leftPanel);
-    schemaBtn->setIcon(style()->standardIcon(QStyle::SP_FileDialogContentsView));
-    schemaBtn->setText(" Блок-схема");
-    schemaBtn->setToolTip("Блок-схема");
-    schemaBtn->setMinimumHeight(32);
-
-    btnRow->addWidget(taskBtn);
-    btnRow->addWidget(schemaBtn);
-    vbox->addLayout(btnRow);
-
-    connect(taskBtn, &QPushButton::clicked, this, [this]() {
-        TaskDialog dlg(this);
-        dlg.exec();
-    });
-    connect(schemaBtn, &QPushButton::clicked, this, [this]() {
-        SchemaDialog dlg(this);
-        dlg.exec();
-    });
 
     // ── Formula label ────────────────────────────
     formulaLabel = new QLabel(leftPanel);
@@ -126,7 +94,7 @@ void GraphWidget::setupLeftPanel()
 
         slider = new QSlider(Qt::Horizontal, leftPanel);
         slider->setRange(-50, 50);
-        slider->setValue(10);   // default 1.0
+        slider->setValue(10);
         slider->setTickInterval(10);
         slider->setTickPosition(QSlider::TicksBelow);
 
@@ -147,7 +115,6 @@ void GraphWidget::setupLeftPanel()
     makeSliderRow("b", labelB, sliderB, spinB);
     makeSliderRow("c", labelC, sliderC, spinC);
 
-    // Connect sliders → spinboxes (and vice-versa)
     connect(sliderA, &QSlider::valueChanged, this, &GraphWidget::onSliderAChanged);
     connect(sliderB, &QSlider::valueChanged, this, &GraphWidget::onSliderBChanged);
     connect(sliderC, &QSlider::valueChanged, this, &GraphWidget::onSliderCChanged);
@@ -175,7 +142,6 @@ void GraphWidget::setupLeftPanel()
     table->setStyleSheet("QTableWidget { font-size: 11px; }");
     vbox->addWidget(table);
 
-    // ── Spacer ───────────────────────────────────
     vbox->addStretch(1);
 
     // ── User label ───────────────────────────────
@@ -210,8 +176,6 @@ void GraphWidget::updateFormulaLabel()
     formulaLabel->setText(html);
 }
 
-// ─────────────────────────────────────────────
-//  Slider ↔ SpinBox sync
 // ─────────────────────────────────────────────
 void GraphWidget::onSliderAChanged(int value)
 {
@@ -274,8 +238,6 @@ void GraphWidget::onLogoutClicked()
 }
 
 // ─────────────────────────────────────────────
-//  Update graph data
-// ─────────────────────────────────────────────
 double GraphWidget::calculate(double x, double a, double b, double c) const
 {
     if (x < -2.0)
@@ -299,7 +261,6 @@ void GraphWidget::updateGraph()
     pointsBranch2.clear();
     pointsBranch3.clear();
 
-    // Try to get data from server
     QString request = QString("get_graph||-10||10||0.1||%1||%2||%3")
                           .arg(a, 0, 'f', 2)
                           .arg(b, 0, 'f', 2)
@@ -332,7 +293,6 @@ void GraphWidget::updateGraph()
         }
     }
 
-    // Fallback: compute locally if server unavailable or parse failed
     if (!parsedFromServer) {
         const double xStart = -10.0;
         const double xEnd   =  10.0;
@@ -350,13 +310,11 @@ void GraphWidget::updateGraph()
     }
 
     fillTable(a, b, c);
-    update();  // trigger paintEvent
+    update();
 }
 
 void GraphWidget::fillTable(double a, double b, double c)
 {
-    // 10 evenly spaced points from -10 to 10 (step = ~2.0)
-    // Use step 2.0: -10, -8, -6, -4, -2, 0, 2, 4, 6, 8  → 10 values
     const double step = 2.0;
     int row = 0;
     for (double x = -10.0; x <= 9.0 && row < 10; x += step, ++row) {
@@ -379,8 +337,6 @@ void GraphWidget::setUserLogin(const QString &login)
 }
 
 // ─────────────────────────────────────────────
-//  Paint
-// ─────────────────────────────────────────────
 void GraphWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
@@ -394,7 +350,6 @@ void GraphWidget::paintEvent(QPaintEvent *event)
     int totalW = width();
     int totalH = height();
 
-    // Graph drawing area
     int drawX = leftOffset + MARGIN;
     int drawY = MARGIN;
     int drawW = totalW - leftOffset - MARGIN * 2;
@@ -402,11 +357,9 @@ void GraphWidget::paintEvent(QPaintEvent *event)
 
     if (drawW < 50 || drawH < 50) return;
 
-    // ── White background for graph area ──────────
     painter.fillRect(leftOffset, 0, totalW - leftOffset, totalH, QColor("#ffffff"));
     painter.fillRect(drawX, drawY, drawW, drawH, QColor("#ffffff"));
 
-    // Collect all points for range
     QVector<QPointF> allPts;
     allPts.append(pointsBranch1);
     allPts.append(pointsBranch2);
@@ -423,7 +376,6 @@ void GraphWidget::paintEvent(QPaintEvent *event)
         if (pt.y() > yMax) yMax = pt.y();
     }
 
-    // Add a small padding to y range
     double yPad = (yMax - yMin) * 0.05;
     if (yPad < 0.5) yPad = 0.5;
     yMin -= yPad;
@@ -444,26 +396,20 @@ void GraphWidget::paintEvent(QPaintEvent *event)
         return drawY + drawH - static_cast<int>((y - yMin) * scaleY);
     };
 
-    // ── Border around graph area ──────────────────
     painter.setPen(QPen(QColor("#aaaaaa"), 1));
     painter.drawRect(drawX, drawY, drawW, drawH);
 
-    // ── Grid lines (dashed, light gray) ─────────
     {
         QPen gridPen(QColor("#e0e0e0"), 1, Qt::DashLine);
         painter.setPen(gridPen);
         painter.setFont(QFont("Arial", 8));
 
-        // Vertical grid lines (for x)
         double xStep = 2.0;
         for (double gx = std::ceil(xMin / xStep) * xStep; gx <= xMax + 1e-9; gx += xStep) {
             int sx = toScreenX(gx);
-            if (sx >= drawX && sx <= drawX + drawW) {
+            if (sx >= drawX && sx <= drawX + drawW)
                 painter.drawLine(sx, drawY, sx, drawY + drawH);
-            }
         }
-        // Horizontal grid lines (for y)
-        // Determine a nice step for y
         double yRange = yMax - yMin;
         double rawStep = yRange / 8.0;
         double mag = std::pow(10.0, std::floor(std::log10(rawStep)));
@@ -475,51 +421,41 @@ void GraphWidget::paintEvent(QPaintEvent *event)
         if (yStep < 0.01) yStep = 0.5;
         for (double gy = std::ceil(yMin / yStep) * yStep; gy <= yMax + 1e-9; gy += yStep) {
             int sy = toScreenY(gy);
-            if (sy >= drawY && sy <= drawY + drawH) {
+            if (sy >= drawY && sy <= drawY + drawH)
                 painter.drawLine(drawX, sy, drawX + drawW, sy);
-            }
         }
     }
 
-    // ── Axes ─────────────────────────────────────
     {
         QPen axisPen(QColor("#000000"), 2);
         painter.setPen(axisPen);
 
-        // X-axis (y=0)
         if (yMin <= 0.0 && yMax >= 0.0) {
             int sy = toScreenY(0.0);
             painter.drawLine(drawX, sy, drawX + drawW, sy);
-            // Arrow
             painter.drawLine(drawX + drawW - 8, sy - 4, drawX + drawW, sy);
             painter.drawLine(drawX + drawW - 8, sy + 4, drawX + drawW, sy);
         }
-        // Y-axis (x=0)
         if (xMin <= 0.0 && xMax >= 0.0) {
             int sx = toScreenX(0.0);
             painter.drawLine(sx, drawY, sx, drawY + drawH);
-            // Arrow
             painter.drawLine(sx - 4, drawY + 8, sx, drawY);
             painter.drawLine(sx + 4, drawY + 8, sx, drawY);
         }
 
-        // Axis tick labels
         painter.setFont(QFont("Arial", 8));
         painter.setPen(QColor("#333333"));
 
-        // X ticks
         double xStep = 2.0;
         for (double gx = std::ceil(xMin / xStep) * xStep; gx <= xMax + 1e-9; gx += xStep) {
             int sx = toScreenX(gx);
             if (sx < drawX || sx > drawX + drawW) continue;
             int sy0 = (yMin <= 0.0 && yMax >= 0.0) ? toScreenY(0.0) : drawY + drawH;
             painter.drawLine(sx, sy0 - 3, sx, sy0 + 3);
-            QString lbl = QString::number(gx, 'f', (std::fabs(gx) < 1e-6) ? 0 : 0);
-            QRect lblRect(sx - 20, sy0 + 5, 40, 14);
-            painter.drawText(lblRect, Qt::AlignCenter, lbl);
+            QString lbl = QString::number(gx, 'f', 0);
+            painter.drawText(QRect(sx - 20, sy0 + 5, 40, 14), Qt::AlignCenter, lbl);
         }
 
-        // Y ticks
         double yRange = yMax - yMin;
         double rawStep = yRange / 8.0;
         double mag = std::pow(10.0, std::floor(std::log10(rawStep)));
@@ -539,14 +475,12 @@ void GraphWidget::paintEvent(QPaintEvent *event)
             painter.drawText(QRect(sx0 - 45, sy - 7, 40, 14), Qt::AlignRight | Qt::AlignVCenter, lbl);
         }
 
-        // Axis labels
         painter.setFont(QFont("Arial", 10, QFont::Bold));
         painter.setPen(QColor("#000000"));
         painter.drawText(drawX + drawW - 12, drawY + drawH / 2 + 12, "x");
         painter.drawText(drawX + drawW / 2 - 6, drawY + 14, "y");
     }
 
-    // ── Draw three branches ───────────────────────
     auto drawBranchLines = [&](const QVector<QPointF> &pts, const QColor &color) {
         if (pts.size() < 2) return;
         QPen pen(color, 2.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
@@ -556,7 +490,6 @@ void GraphWidget::paintEvent(QPaintEvent *event)
             int y1 = toScreenY(pts[i-1].y());
             int x2 = toScreenX(pts[i].x());
             int y2 = toScreenY(pts[i].y());
-            // Clip to draw area
             if ((x1 < drawX && x2 < drawX) || (x1 > drawX+drawW && x2 > drawX+drawW)) continue;
             if ((y1 < drawY && y2 < drawY) || (y1 > drawY+drawH && y2 > drawY+drawH)) continue;
             painter.drawLine(x1, y1, x2, y2);
@@ -567,14 +500,12 @@ void GraphWidget::paintEvent(QPaintEvent *event)
     drawBranchLines(pointsBranch2, QColor(Qt::darkGreen));
     drawBranchLines(pointsBranch3, QColor(Qt::blue));
 
-    // ── Legend ───────────────────────────────────
     {
         int lx = drawX + 10;
         int ly = drawY + 10;
         int lw = 220;
         int lh = 64;
 
-        // Semi-transparent background
         painter.fillRect(lx - 4, ly - 4, lw + 8, lh + 8, QColor(255, 255, 255, 200));
         painter.setPen(QColor("#aaaaaa"));
         painter.drawRect(lx - 4, ly - 4, lw + 8, lh + 8);

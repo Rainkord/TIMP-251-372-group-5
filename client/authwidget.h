@@ -25,6 +25,7 @@ private slots:
     void onTogglePassword();
     void onLockTimerFired();
     void onRegisterClicked();
+    void onAuthResponseReceived(const QString &response);
 
 private:
     QLineEdit   *loginEdit;
@@ -35,10 +36,11 @@ private:
     QLabel      *statusLabel;
     QLabel      *attemptsLabel;
 
-    int         failedAttempts;
-    int         lockLevel;
-    QTimer      *lockTimer;
-    bool        isLocked;
+    int    failedAttempts;
+    int    lockLevel;
+    QTimer *lockTimer;
+    bool   isLocked;
+    bool   m_waitingForAuth;
 
     void applyLock(int minutes, const QString &message);
     void setupUI();

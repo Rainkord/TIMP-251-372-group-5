@@ -9,17 +9,20 @@
 #include <QTimer>
 #include <QCryptographicHash>
 #include <QFont>
-#include <QString>
 
 AuthWidget::AuthWidget(QWidget *parent)
     : QWidget(parent),
       failedAttempts(0),
       lockLevel(0),
-      isLocked(false)
+      isLocked(false),
+      m_waitingForAuth(false)
 {
     lockTimer = new QTimer(this);
     lockTimer->setSingleShot(true);
     connect(lockTimer, &QTimer::timeout, this, &AuthWidget::onLockTimerFired);
+
+    connect(&ClientSingleton::instance(), &ClientSingleton::responseReceived,
+            this, &AuthWidget::onAuthResponseReceived);
 
     setupUI();
 }
@@ -34,7 +37,6 @@ void AuthWidget::setupUI()
     mainLayout->setContentsMargins(40, 30, 40, 30);
     mainLayout->setSpacing(12);
 
-    // Title
     QLabel *titleLabel = new QLabel("Авторизация", this);
     QFont titleFont = titleLabel->font();
     titleFont.setBold(true);
@@ -42,17 +44,14 @@ void AuthWidget::setupUI()
     titleLabel->setFont(titleFont);
     titleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(titleLabel);
-
     mainLayout->addSpacing(10);
 
-    // Login field
     loginEdit = new QLineEdit(this);
     loginEdit->setPlaceholderText("Логин");
     loginEdit->setMinimumHeight(36);
     loginEdit->setStyleSheet("QLineEdit { padding: 4px 8px; border: 1px solid #cccccc; border-radius: 4px; }");
     mainLayout->addWidget(loginEdit);
 
-    // Password field row (password + eye button)
     QHBoxLayout *passwordLayout = new QHBoxLayout();
     passwordLayout->setSpacing(6);
 
@@ -73,10 +72,8 @@ void AuthWidget::setupUI()
     );
     connect(togglePasswordBtn, &QPushButton::clicked, this, &AuthWidget::onTogglePassword);
     passwordLayout->addWidget(togglePasswordBtn);
-
     mainLayout->addLayout(passwordLayout);
 
-    // Status label (errors)
     statusLabel = new QLabel(this);
     statusLabel->setStyleSheet("QLabel { color: red; }");
     statusLabel->setAlignment(Qt::AlignCenter);
@@ -84,7 +81,6 @@ void AuthWidget::setupUI()
     statusLabel->hide();
     mainLayout->addWidget(statusLabel);
 
-    // Attempts label
     attemptsLabel = new QLabel(this);
     attemptsLabel->setStyleSheet("QLabel { color: #888888; font-size: 10pt; }");
     attemptsLabel->setAlignment(Qt::AlignCenter);
@@ -93,7 +89,6 @@ void AuthWidget::setupUI()
 
     mainLayout->addSpacing(8);
 
-    // Login button
     loginBtn = new QPushButton("Войти", this);
     loginBtn->setMinimumHeight(38);
     loginBtn->setStyleSheet(
@@ -106,7 +101,6 @@ void AuthWidget::setupUI()
 
     mainLayout->addSpacing(8);
 
-    // Register link button
     registerBtn = new QPushButton("Регистрация", this);
     registerBtn->setFlat(true);
     registerBtn->setStyleSheet(
@@ -121,11 +115,9 @@ void AuthWidget::setupUI()
 
 void AuthWidget::onTogglePassword()
 {
-    if (passwordEdit->echoMode() == QLineEdit::Password) {
-        passwordEdit->setEchoMode(QLineEdit::Normal);
-    } else {
-        passwordEdit->setEchoMode(QLineEdit::Password);
-    }
+    passwordEdit->setEchoMode(
+        passwordEdit->echoMode() == QLineEdit::Password ? QLineEdit::Normal : QLineEdit::Password
+    );
 }
 
 void AuthWidget::applyLock(int minutes, const QString &message)
@@ -135,12 +127,7 @@ void AuthWidget::applyLock(int minutes, const QString &message)
     statusLabel->setText(message);
     statusLabel->show();
     attemptsLabel->hide();
-    if (minutes == 0) {
-        // Special case: 30 seconds
-        lockTimer->start(30 * 1000);
-    } else {
-        lockTimer->start(minutes * 60 * 1000);
-    }
+    lockTimer->start(minutes == 0 ? 30 * 1000 : minutes * 60 * 1000);
 }
 
 void AuthWidget::onLockTimerFired()
@@ -154,24 +141,18 @@ void AuthWidget::onLockTimerFired()
 void AuthWidget::onLoginClicked()
 {
     if (isLocked) {
-        int remainingMs = lockTimer->remainingTime();
-        int remainingSec = remainingMs / 1000;
-        int remainingMin = remainingSec / 60;
+        int remainingSec    = lockTimer->remainingTime() / 1000;
+        int remainingMin    = remainingSec / 60;
         int remainingSecMod = remainingSec % 60;
-
-        QString timeStr;
-        if (remainingMin > 0) {
-            timeStr = QString("Осталось %1 мин %2 сек").arg(remainingMin).arg(remainingSecMod);
-        } else {
-            timeStr = QString("Осталось %1 сек").arg(remainingSec);
-        }
-
+        QString timeStr = remainingMin > 0
+            ? QString("Осталось %1 мин %2 сек").arg(remainingMin).arg(remainingSecMod)
+            : QString("Осталось %1 сек").arg(remainingSec);
         statusLabel->setText("Аккаунт заблокирован. " + timeStr);
         statusLabel->show();
         return;
     }
 
-    QString login = loginEdit->text().trimmed();
+    QString login    = loginEdit->text().trimmed();
     QString password = passwordEdit->text();
 
     if (login.isEmpty() || password.isEmpty()) {
@@ -180,58 +161,60 @@ void AuthWidget::onLoginClicked()
         return;
     }
 
-    // Hash password with SHA-256
-    QByteArray passwordBytes = password.toUtf8();
-    QByteArray hashBytes = QCryptographicHash::hash(passwordBytes, QCryptographicHash::Sha256);
+    loginBtn->setEnabled(false);
+    statusLabel->setText("Подключаемся...");
+    statusLabel->setStyleSheet("QLabel { color: #888888; }");
+    statusLabel->show();
+
+    QByteArray hashBytes = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
     QString passwordHash = QString::fromLatin1(hashBytes.toHex());
 
-    // Send auth request
+    m_waitingForAuth = true;
     QString request = QString("auth||%1||%2").arg(login, passwordHash);
-    QString response = ClientSingleton::instance().sendRequest(request);
+    ClientSingleton::instance().sendRequestAsync(request);
+}
 
-    if (response == "auth_code_sent") {
-        emit showVerifyAuth(login);
+void AuthWidget::onAuthResponseReceived(const QString &response)
+{
+    if (!m_waitingForAuth) return;
+    m_waitingForAuth = false;
+
+    QString r = response.trimmed();
+    if (r.isEmpty()) {
+        loginBtn->setEnabled(true);
+        statusLabel->setText("Ошибка соединения с сервером.");
+        statusLabel->setStyleSheet("QLabel { color: red; }");
+        statusLabel->show();
         return;
     }
 
-    if (response == "auth-") {
+    if (r == "auth_code_sent") {
+        statusLabel->hide();
+        emit showVerifyAuth(loginEdit->text().trimmed());
+        return;
+    }
+
+    loginBtn->setEnabled(true);
+    statusLabel->setStyleSheet("QLabel { color: red; }");
+
+    if (r == "auth-") {
         failedAttempts++;
-
         if (failedAttempts < 4) {
-            int remaining = 4 - failedAttempts;
-            statusLabel->setText(QString("Неверный логин или пароль. Осталось попыток: %1").arg(remaining));
+            statusLabel->setText(
+                QString("Неверный логин или пароль. Осталось попыток: %1").arg(4 - failedAttempts)
+            );
             statusLabel->show();
-            attemptsLabel->hide();
             return;
         }
-
-        if (failedAttempts == 4) {
-            lockLevel = 1;
-            applyLock(0, "Аккаунт заблокирован на 30 секунд");
-            return;
-        }
-
-        if (failedAttempts == 5) {
-            lockLevel = 2;
-            applyLock(5, "Аккаунт заблокирован на 5 минут");
-            return;
-        }
-
-        if (failedAttempts == 6) {
-            lockLevel = 3;
-            applyLock(10, "Аккаунт заблокирован на 10 минут");
-            return;
-        }
-
-        // failedAttempts >= 7
-        lockLevel = 4;
-        applyLock(9999, "Аккаунт заблокирован на длительное время");
+        if (failedAttempts == 4) { lockLevel = 1; applyLock(0,    "Аккаунт заблокирован на 30 секунд");           return; }
+        if (failedAttempts == 5) { lockLevel = 2; applyLock(5,    "Аккаунт заблокирован на 5 минут");             return; }
+        if (failedAttempts == 6) { lockLevel = 3; applyLock(10,   "Аккаунт заблокирован на 10 минут");            return; }
+        lockLevel = 4; applyLock(9999, "Аккаунт заблокирован на длительное время");
         return;
     }
 
-    // Unexpected response
-    statusLabel->setText("Ошибка соединения с сервером.");
-    statusLabel->show();
+    // Неизвестный ответ — возможно, ответ от другого виджета, игнорируем
+    m_waitingForAuth = false;
 }
 
 void AuthWidget::onRegisterClicked()

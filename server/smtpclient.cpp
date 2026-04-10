@@ -12,13 +12,10 @@ const QString SmtpClient::senderPassword = "cwrnduhauccsenad";
 static QByteArray waitForData(QSslSocket *socket, int timeoutMs = 15000)
 {
     QByteArray result;
-    // First wait
     if (socket->bytesAvailable() == 0) {
         socket->waitForReadyRead(timeoutMs);
     }
     result = socket->readAll();
-
-    // Give server a moment to send all lines (multi-line responses)
     while (socket->waitForReadyRead(500)) {
         result.append(socket->readAll());
     }
@@ -30,7 +27,6 @@ static QString readResponse(QSslSocket *socket, int timeoutMs = 15000)
     QByteArray data = waitForData(socket, timeoutMs);
     QString all = QString::fromUtf8(data).trimmed();
     if (!all.isEmpty()) {
-        // Return last line (the final status line)
         QStringList lines = all.split('\n');
         QString last = lines.last().trimmed();
         qDebug() << "[SMTP] <--" << last;
@@ -49,85 +45,49 @@ static QString sendCmd(QSslSocket *socket, const QByteArray &cmd)
     return readResponse(socket);
 }
 
-bool SmtpClient::sendVerificationCode(const QString &toEmail, const QString &code)
+static bool doSend(const QString &toEmail,
+                   const QString &subjectText,
+                   const QString &bodyText)
 {
     QSslSocket socket;
-
-    // Port 465: connect with SSL directly (no STARTTLS needed)
-    socket.connectToHostEncrypted(smtpHost, smtpPort);
-    // Ignore any SSL certificate errors
+    socket.connectToHostEncrypted(SmtpClient::smtpHost, SmtpClient::smtpPort);
     socket.ignoreSslErrors();
     if (!socket.waitForEncrypted(20000)) {
         qDebug() << "[SMTP] SSL connection failed:" << socket.errorString();
         return false;
     }
-    qDebug() << "[SMTP] SSL connected to" << smtpHost << ":" << smtpPort;
+    qDebug() << "[SMTP] SSL connected";
 
-    // Read greeting
-    QString greeting = readResponse(&socket, 15000);
-    if (greeting.isEmpty() || !greeting.startsWith("220")) {
-        qDebug() << "[SMTP] Bad greeting:" << greeting;
-        return false;
-    }
+    QString resp = readResponse(&socket, 15000);
+    if (resp.isEmpty() || !resp.startsWith("220")) return false;
 
-    // EHLO
-    QString resp = sendCmd(&socket, "EHLO localhost\r\n");
-    if (!resp.startsWith("250")) {
-        qDebug() << "[SMTP] EHLO failed:" << resp;
-        return false;
-    }
+    resp = sendCmd(&socket, "EHLO localhost\r\n");
+    if (!resp.startsWith("250")) return false;
 
-    // AUTH LOGIN
     resp = sendCmd(&socket, "AUTH LOGIN\r\n");
-    if (!resp.startsWith("334")) {
-        qDebug() << "[SMTP] AUTH LOGIN failed:" << resp;
-        return false;
-    }
+    if (!resp.startsWith("334")) return false;
 
-    // Username
-    resp = sendCmd(&socket, senderEmail.toUtf8().toBase64() + "\r\n");
-    if (!resp.startsWith("334")) {
-        qDebug() << "[SMTP] Username rejected:" << resp;
-        return false;
-    }
+    resp = sendCmd(&socket, SmtpClient::senderEmail.toUtf8().toBase64() + "\r\n");
+    if (!resp.startsWith("334")) return false;
 
-    // Password
-    resp = sendCmd(&socket, senderPassword.toUtf8().toBase64() + "\r\n");
-    if (!resp.startsWith("235")) {
-        qDebug() << "[SMTP] Auth failed:" << resp;
-        return false;
-    }
+    resp = sendCmd(&socket, SmtpClient::senderPassword.toUtf8().toBase64() + "\r\n");
+    if (!resp.startsWith("235")) return false;
     qDebug() << "[SMTP] Authenticated";
 
-    // MAIL FROM
-    resp = sendCmd(&socket, "MAIL FROM:<" + senderEmail.toUtf8() + ">\r\n");
-    if (!resp.startsWith("250")) {
-        qDebug() << "[SMTP] MAIL FROM failed:" << resp;
-        return false;
-    }
+    resp = sendCmd(&socket, "MAIL FROM:<" + SmtpClient::senderEmail.toUtf8() + ">\r\n");
+    if (!resp.startsWith("250")) return false;
 
-    // RCPT TO
     resp = sendCmd(&socket, "RCPT TO:<" + toEmail.toUtf8() + ">\r\n");
-    if (!resp.startsWith("250")) {
-        qDebug() << "[SMTP] RCPT TO failed:" << resp;
-        return false;
-    }
+    if (!resp.startsWith("250")) return false;
 
-    // DATA
     resp = sendCmd(&socket, "DATA\r\n");
-    if (!resp.startsWith("354")) {
-        qDebug() << "[SMTP] DATA failed:" << resp;
-        return false;
-    }
+    if (!resp.startsWith("354")) return false;
 
-    // Email body
-    QString subjectText = QString::fromUtf8("Код подтверждения ТИМП");
     QByteArray subjectB64 = subjectText.toUtf8().toBase64();
-    QString bodyText = QString::fromUtf8("Ваш код подтверждения: ") + code;
 
     QByteArray email;
     email += "Subject: =?UTF-8?B?" + subjectB64 + "?=\r\n";
-    email += "From: " + senderEmail.toUtf8() + "\r\n";
+    email += "From: " + SmtpClient::senderEmail.toUtf8() + "\r\n";
     email += "To: " + toEmail.toUtf8() + "\r\n";
     email += "Content-Type: text/plain; charset=UTF-8\r\n";
     email += "\r\n";
@@ -150,4 +110,22 @@ bool SmtpClient::sendVerificationCode(const QString &toEmail, const QString &cod
 
     qDebug() << "[SMTP] Email sent to" << toEmail;
     return true;
+}
+
+bool SmtpClient::sendVerificationCode(const QString &toEmail, const QString &code)
+{
+    QString subject = QString::fromUtf8("Код подтверждения ТИМП");
+    QString body    = QString::fromUtf8("Ваш код подтверждения: ") + code;
+    return doSend(toEmail, subject, body);
+}
+
+bool SmtpClient::sendPasswordResetCode(const QString &toEmail,
+                                        const QString &login,
+                                        const QString &code)
+{
+    QString subject = QString::fromUtf8("Восстановление пароля ТИМП");
+    QString body    = QString::fromUtf8("Здравствуйте, ") + login +
+                      QString::fromUtf8(".\n\nВаш код для сброса пароля: ") + code +
+                      QString::fromUtf8("\n\nЕсли вы не запрашивали сброс пароля — игнорируйте это письмо.");
+    return doSend(toEmail, subject, body);
 }

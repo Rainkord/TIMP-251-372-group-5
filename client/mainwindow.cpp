@@ -6,10 +6,28 @@
 #include <QApplication>
 #include <QSpacerItem>
 #include <QFrame>
+#include <QPainter>
+
+// ── GitHub Dark palette ──────────────────────────────────────────────────
+#define GH_BG          "#0d1117"
+#define GH_TOPBAR      "#161b22"
+#define GH_BORDER      "#30363d"
+#define GH_TEXT        "#e6edf3"
+#define GH_MUTED       "#8b949e"
+#define GH_BTN_GHOST   "#21262d"
+#define GH_BTN_GHOST_H "#30363d"
+#define GH_BLUE        "#388bfd"
+#define FONT_FAMILY    "Segoe UI"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // Глобальный фон всего окна
+    setStyleSheet(QString(
+        "QMainWindow { background-color: %1; }"
+        "QWidget      { background-color: %1; color: %2; font-family: '%3'; }"
+    ).arg(GH_BG).arg(GH_TEXT).arg(FONT_FAMILY));
+
     setupUI();
     connectSignals();
     stackedWidget->setCurrentIndex(IDX_AUTH);
@@ -29,18 +47,22 @@ void MainWindow::setupUI()
     mainVLayout->setContentsMargins(0, 0, 0, 0);
     mainVLayout->setSpacing(0);
 
+    // ── Top bar ──────────────────────────────────────────────────────────
     QWidget *topBar = new QWidget(centralWidget);
-    topBar->setFixedHeight(40);
-    topBar->setStyleSheet(
-        "QWidget { background-color: #2c3e50; }"
-        "QPushButton { background-color: #34495e; color: white; border: none; "
-        "border-radius: 4px; padding: 4px 10px; font-size: 11px; }"
-        "QPushButton:hover { background-color: #4a6278; }"
-        "QPushButton:pressed { background-color: #1a252f; }"
-    );
+    topBar->setFixedHeight(44);
+    topBar->setStyleSheet(QString(
+        "QWidget { background-color: %1; border-bottom: 1px solid %2; }"
+        "QPushButton {"
+        "  background-color: %3; color: %4;"
+        "  border: 1px solid %2; border-radius: 6px;"
+        "  padding: 4px 12px; font-size: 11px; font-family: '%5';"
+        "}"
+        "QPushButton:hover  { background-color: %6; }"
+        "QPushButton:pressed { background-color: %2; }"
+    ).arg(GH_TOPBAR).arg(GH_BORDER).arg(GH_BTN_GHOST).arg(GH_TEXT).arg(FONT_FAMILY).arg(GH_BTN_GHOST_H));
 
     topBarLayout = new QHBoxLayout(topBar);
-    topBarLayout->setContentsMargins(8, 4, 8, 4);
+    topBarLayout->setContentsMargins(12, 0, 12, 0);
     topBarLayout->setSpacing(6);
 
     taskBtn = new QPushButton(topBar);
@@ -48,17 +70,19 @@ void MainWindow::setupUI()
     taskBtn->setText("  Задание");
     taskBtn->setToolTip("Показать задание");
     taskBtn->setMinimumWidth(100);
+    taskBtn->setMinimumHeight(30);
 
     schemaBtn = new QPushButton(topBar);
     schemaBtn->setIcon(style()->standardIcon(QStyle::SP_FileDialogContentsView));
     schemaBtn->setText("  Блок-схема");
     schemaBtn->setToolTip("Показать блок-схему");
     schemaBtn->setMinimumWidth(110);
+    schemaBtn->setMinimumHeight(30);
 
     appTitleLabel = new QLabel("ТМП — Подгруппа 5", topBar);
-    appTitleLabel->setStyleSheet(
-        "QLabel { color: #ecf0f1; font-size: 12px; font-weight: bold; background: transparent; }"
-    );
+    appTitleLabel->setStyleSheet(QString(
+        "QLabel { color: %1; font-size: 12px; font-weight: bold; background: transparent; border: none; }"
+    ).arg(GH_TEXT));
     appTitleLabel->setAlignment(Qt::AlignCenter);
 
     topBarLayout->addWidget(taskBtn);
@@ -67,13 +91,11 @@ void MainWindow::setupUI()
     topBarLayout->addWidget(appTitleLabel);
     topBarLayout->addStretch(1);
 
-    QFrame *separator = new QFrame(centralWidget);
-    separator->setFrameShape(QFrame::HLine);
-    separator->setFrameShadow(QFrame::Plain);
-    separator->setStyleSheet("QFrame { color: #1a252f; }");
-    separator->setFixedHeight(1);
-
+    // ── StackedWidget ─────────────────────────────────────────────────────
     stackedWidget = new QStackedWidget(centralWidget);
+    stackedWidget->setStyleSheet(QString(
+        "QStackedWidget { background-color: %1; }"
+    ).arg(GH_BG));
 
     authWidget   = new AuthWidget(stackedWidget);
     regWidget    = new RegWidget(stackedWidget);
@@ -88,7 +110,6 @@ void MainWindow::setupUI()
     stackedWidget->addWidget(resetWidget);   // 4
 
     mainVLayout->addWidget(topBar);
-    mainVLayout->addWidget(separator);
     mainVLayout->addWidget(stackedWidget, 1);
 
     centralWidget->setLayout(mainVLayout);
@@ -138,14 +159,10 @@ void MainWindow::onVerificationSuccess(const QString &login)
     stackedWidget->setCurrentIndex(IDX_GRAPH);
 }
 
-void MainWindow::onBackToAuth()         { stackedWidget->setCurrentIndex(IDX_AUTH); }
-void MainWindow::onRegistrationSuccess(){ stackedWidget->setCurrentIndex(IDX_AUTH); }
-void MainWindow::onLogout()             { stackedWidget->setCurrentIndex(IDX_AUTH); }
-
-void MainWindow::onResetSuccess()
-{
-    stackedWidget->setCurrentIndex(IDX_AUTH);
-}
+void MainWindow::onBackToAuth()          { stackedWidget->setCurrentIndex(IDX_AUTH); }
+void MainWindow::onRegistrationSuccess() { stackedWidget->setCurrentIndex(IDX_AUTH); }
+void MainWindow::onLogout()              { stackedWidget->setCurrentIndex(IDX_AUTH); }
+void MainWindow::onResetSuccess()        { stackedWidget->setCurrentIndex(IDX_AUTH); }
 
 void MainWindow::onTaskBtnClicked()
 {

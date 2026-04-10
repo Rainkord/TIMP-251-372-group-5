@@ -15,7 +15,7 @@ QMap<QString, TempResetData> FunctionsForServer::pendingResets;
 
 QString FunctionsForServer::generateCode()
 {
-    quint32 number = QRandomGenerator::global()->bounded(1000000u); // 0 .. 999999
+    quint32 number = QRandomGenerator::global()->bounded(1000000u);
     return QString("%1").arg(number, 6, 10, QChar('0'));
 }
 
@@ -70,15 +70,18 @@ QString FunctionsForServer::handleRegistration(const QStringList &parts)
         return "error||invalid_params";
     }
 
-    // Check if user already exists in DB
+    // Check if login already taken
     if (Database::instance().userExists(login)) {
         return "reg-||user_exists";
     }
 
-    // Generate 6-digit code
+    // Check if email already registered
+    if (Database::instance().emailExists(email)) {
+        return "reg-||email_exists";
+    }
+
     QString code = generateCode();
 
-    // Store in pending registrations (overwrite if re-registering)
     TempRegData data;
     data.name         = login;
     data.passwordHash = passwordHash;
@@ -88,7 +91,6 @@ QString FunctionsForServer::handleRegistration(const QStringList &parts)
 
     qDebug() << "[Server] Registration code for" << login << ":" << code;
 
-    // Send email
     bool sent = SmtpClient::sendVerificationCode(email, code);
     if (!sent) {
         qDebug() << "[Server] Failed to send email to" << email;
@@ -118,7 +120,6 @@ QString FunctionsForServer::handleVerifyReg(const QStringList &parts)
         return "reg-||wrong_code";
     }
 
-    // Code correct — add user to DB
     bool ok = Database::instance().addUser(data.name, data.passwordHash, data.email);
     if (!ok) {
         pendingRegistrations.remove(login);
@@ -141,19 +142,16 @@ QString FunctionsForServer::handleAuth(const QStringList &parts)
     QString login        = parts[1].trimmed();
     QString passwordHash = parts[2].trimmed();
 
-    // Validate credentials
     if (!Database::instance().checkUser(login, passwordHash)) {
         qDebug() << "[Server] Auth failed for:" << login;
         return "auth-";
     }
 
-    // Generate 2FA code
     QString code = generateCode();
     pendingCodes[login] = code;
 
     qDebug() << "[Server] Auth code for" << login << ":" << code;
 
-    // Get user email and send code
     QString email = Database::instance().getUserEmail(login);
     if (!email.isEmpty()) {
         SmtpClient::sendVerificationCode(email, code);
@@ -244,7 +242,6 @@ QString FunctionsForServer::handleResetPassword(const QStringList &parts)
         return "error||invalid_params";
     }
 
-    // Check that a user with this email exists
     if (!Database::instance().emailExists(email)) {
         qDebug() << "[Server] reset_password: email not found:" << email;
         return "reset_error";
@@ -303,7 +300,6 @@ QString FunctionsForServer::handleSetNewPassword(const QStringList &parts)
     QString code         = parts[2].trimmed();
     QString passwordHash = parts[3].trimmed();
 
-    // Re-verify code to prevent bypassing step 2
     if (!pendingResets.contains(email) || pendingResets[email].code != code) {
         qDebug() << "[Server] set_new_password: invalid or expired code for" << email;
         return "reset_error";

@@ -120,12 +120,6 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
     p.fillRect(rect(), FC_BG);
 
-    // Все размеры увеличены в 1.3 раза относительно базовых:
-    // bw=200->260, bh=40->52, dw=240->312, dh=70->91, gap=18->23
-    // ширина схемы = dw/2 + 300*1.3 + bw/2 + 25 = 156 + 390 + 130 + 25 = 701
-    // при канвасе 700: centerX = 156 + (700-701)/2 ≈ 156 (marginally ok, зажмём routeX на 1px)
-    // Возьмём centerX=155, rightX=155+390=545, routeX=545+130+25=700 (вплоть к краю)
-    // Чтобы не обрезать, сдвинем всё влево на 5px: centerX=150, rightX=540, routeX=695
     int bw = 260, bh = 52;
     int dw = 312, dh = 91;
     int gap = 23;
@@ -134,8 +128,7 @@ void FlowchartWidget::paintEvent(QPaintEvent *)
     int rightX  = centerX + 390;
     int routeX  = rightX + bw/2 + 25;
 
-    // Сдвиг вниз на 150px
-    int y = 150;
+    int y = 100;
 
     // 1. Начало
     int startW = 182, startH = 47;

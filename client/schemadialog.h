@@ -19,15 +19,18 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
-    // Drawing helpers
+    // Drawing helpers — fill + border colour
     void drawRoundedBlock(QPainter &p, int cx, int cy, int w, int h,
-                          const QString &text, const QColor &fill);
+                          const QString &text,
+                          const QColor &fill, const QColor &border);
     void drawDiamond(QPainter &p, int cx, int cy, int w, int h,
-                     const QString &text, const QColor &fill);
-    void drawArrowDown(QPainter &p, int cx, int y1, int y2);
+                     const QString &text,
+                     const QColor &fill, const QColor &border);
+    void drawArrowDown (QPainter &p, int cx, int y1, int y2);
     void drawArrowRight(QPainter &p, int x1, int x2, int y);
-    void drawArrowLine(QPainter &p, int x1, int y1, int x2, int y2);
-    void drawText(QPainter &p, int cx, int cy, int w, int h, const QString &text);
+    void drawArrowLine (QPainter &p, int x1, int y1, int x2, int y2);
+    void drawText      (QPainter &p, int cx, int cy, int w, int h,
+                        const QString &text);
 };
 
 // ── The dialog ────────────────────────────────────────────────────────
@@ -39,9 +42,9 @@ public:
     ~SchemaDialog();
 
 private:
-    QPushButton    *closeBtn;
+    QPushButton     *closeBtn;
     FlowchartWidget *canvas;
-    QScrollArea    *scrollArea;
+    QScrollArea     *scrollArea;
 
     void setupUI();
 };

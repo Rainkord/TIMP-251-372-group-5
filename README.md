@@ -1,7 +1,4 @@
 # ТМП — Подгруппа 5
-
-Клиент-серверное приложение на Qt / C++ с авторизацией, регистрацией и восстановлением пароля.
-
 ---
 
 ## Структура проекта
@@ -33,29 +30,12 @@ cmake -B build && cmake --build build -j$(nproc)
 
 ---
 
-## Docker — исправление DNS (Arch / CachyOS)
-
-Если при сборке Docker-образа `docker build` падает с ошибками вида:
-```
-Ign:1 http://archive.ubuntu.com ...
-Could not resolve 'archive.ubuntu.com'
-```
-
-Запусти скрипт-фикс (нужен один раз):
+Если при сборке Docker-образа `docker build` падает с ошибками:
 
 ```bash
 chmod +x docker/fix-dns.sh
 ./docker/fix-dns.sh
 ```
-
-**Что делает скрипт:**
-1. Создаёт `/etc/docker/daemon.json` с DNS-серверами Google (`8.8.8.8`) и Cloudflare (`1.1.1.1`).
-2. Перезапускает `dockerd` через `systemctl`.
-3. Предлагает команду для проверки.
-
-> **Причина проблемы:** Docker по умолчанию наследует DNS из `/etc/resolv.conf`. На системах с `systemd-resolved` (Arch, CachyOS) там стоит `127.0.0.53`, который недоступен внутри сетевого неймспейса контейнера.
-
----
 
 ## Компоненты клиента
 

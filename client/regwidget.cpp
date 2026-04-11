@@ -57,7 +57,7 @@ RegWidget::RegWidget(QWidget *parent)
 
 RegWidget::~RegWidget() {}
 
-// ── Style helpers (same as authwidget) ───────────────────────────────────
+// ── Style helpers ────────────────────────────────────────────────────────
 static QString inputStyle()
 {
     return QString(
@@ -161,7 +161,6 @@ static QString successLabelStyle()
 
 void RegWidget::setupUI()
 {
-    // Внешний layout — центрирует карточку
     QVBoxLayout *outerV = new QVBoxLayout(this);
     outerV->setContentsMargins(0, 0, 0, 0);
     outerV->addStretch(1);
@@ -169,22 +168,16 @@ void RegWidget::setupUI()
     QHBoxLayout *outerH = new QHBoxLayout();
     outerH->addStretch(1);
 
-    // Карточка
     QWidget *card = new QWidget(this);
     card->setFixedWidth(360);
     card->setStyleSheet(QString(
-        "QWidget {"
-        "  background-color: %1;"
-        "  border: 1px solid %2;"
-        "  border-radius: 10px;"
-        "}"
+        "QWidget { background-color: %1; border: 1px solid %2; border-radius: 10px; }"
     ).arg(GH_CARD).arg(GH_BORDER));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(card);
     mainLayout->setContentsMargins(28, 28, 28, 28);
     mainLayout->setSpacing(8);
 
-    // Заголовок
     QLabel *titleLabel = new QLabel("Регистрация", card);
     QFont titleFont(FONT_FAMILY, FONT_SIZE_TITLE, QFont::Bold);
     titleLabel->setFont(titleFont);
@@ -212,7 +205,6 @@ void RegWidget::setupUI()
     loginErrorLabel->hide();
     step1Layout->addWidget(loginErrorLabel);
 
-    // Пароль 1
     QHBoxLayout *pass1Row = new QHBoxLayout();
     pass1Row->setSpacing(6);
     passwordEdit = new QLineEdit(step1Widget);
@@ -235,7 +227,6 @@ void RegWidget::setupUI()
     passwordErrorLabel->hide();
     step1Layout->addWidget(passwordErrorLabel);
 
-    // Пароль 2
     QHBoxLayout *pass2Row = new QHBoxLayout();
     pass2Row->setSpacing(6);
     confirmPasswordEdit = new QLineEdit(step1Widget);
@@ -338,7 +329,6 @@ void RegWidget::setupUI()
 
     mainLayout->addWidget(step3Widget);
 
-    // Разделитель + ссылка
     QFrame *line = new QFrame(card);
     line->setFrameShape(QFrame::HLine);
     line->setStyleSheet(QString("QFrame { background: %1; border: none; max-height: 1px; }").arg(GH_BORDER));
@@ -378,7 +368,6 @@ void RegWidget::validateStep1()
     bool passOk    = (passwordEdit->text().length() >= 8);
     bool confirmOk = (!confirmPasswordEdit->text().isEmpty()
                       && confirmPasswordEdit->text() == passwordEdit->text());
-
     continueBtn->setEnabled(loginOk && passOk && confirmOk);
 }
 
@@ -427,15 +416,13 @@ void RegWidget::onConfirmPasswordTextChanged(const QString &text)
 void RegWidget::onTogglePassword1()
 {
     passwordEdit->setEchoMode(
-        passwordEdit->echoMode() == QLineEdit::Password ? QLineEdit::Normal : QLineEdit::Password
-    );
+        passwordEdit->echoMode() == QLineEdit::Password ? QLineEdit::Normal : QLineEdit::Password);
 }
 
 void RegWidget::onTogglePassword2()
 {
     confirmPasswordEdit->setEchoMode(
-        confirmPasswordEdit->echoMode() == QLineEdit::Password ? QLineEdit::Normal : QLineEdit::Password
-    );
+        confirmPasswordEdit->echoMode() == QLineEdit::Password ? QLineEdit::Normal : QLineEdit::Password);
 }
 
 void RegWidget::onContinueClicked()
@@ -562,7 +549,8 @@ void RegWidget::onRegistrationResponseReceived(const QString &response)
             codeStatusLabel->show();
             codeErrorLabel->hide();
             verifyCodeBtn->setEnabled(false);
-            QTimer::singleShot(2000, this, [this]() { emit registrationSuccess(); });
+            // Передаём логин — mainwindow сразу откроет граф
+            QTimer::singleShot(800, this, [this]() { emit registrationSuccess(currentLogin); });
             return;
         }
         if (r.startsWith("reg-")) {

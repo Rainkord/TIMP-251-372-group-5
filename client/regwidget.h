@@ -16,7 +16,7 @@ public:
     ~RegWidget();
 
 signals:
-    void registrationSuccess();
+    void registrationSuccess(const QString &login);
     void showAuth();
 
 private slots:
@@ -66,7 +66,7 @@ private:
     QTimer  *codeLockTimer;
     bool    codeIsLocked;
     bool    m_verifyingCode;
-    bool    m_checkingLogin;   // true while waiting for login-availability response
+    bool    m_checkingLogin;
     QString currentLogin;
 
     void setupUI();

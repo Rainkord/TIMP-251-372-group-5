@@ -21,7 +21,6 @@
 #define GH_BLUE        "#388bfd"
 #define FONT_FAMILY    "Segoe UI"
 
-// Перекрашивает любую иконку Qt в нужный цвет (для тёмного топбара)
 static QIcon tintIcon(const QIcon &src, const QColor &color, int sz = 18)
 {
     QPixmap pm = src.pixmap(sz, sz);
@@ -78,7 +77,6 @@ void MainWindow::setupUI()
     topBarLayout->setContentsMargins(12, 0, 12, 0);
     topBarLayout->setSpacing(6);
 
-    // ── Иконки перекрашены в светлый цвет #e6edf3
     const QColor iconColor(0xe6, 0xed, 0xf3);
 
     taskBtn = new QPushButton(topBar);
@@ -177,10 +175,17 @@ void MainWindow::onVerificationSuccess(const QString &login)
     stackedWidget->setCurrentIndex(IDX_GRAPH);
 }
 
-void MainWindow::onBackToAuth()          { stackedWidget->setCurrentIndex(IDX_AUTH); }
-void MainWindow::onRegistrationSuccess() { stackedWidget->setCurrentIndex(IDX_AUTH); }
-void MainWindow::onLogout()              { stackedWidget->setCurrentIndex(IDX_AUTH); }
-void MainWindow::onResetSuccess()        { stackedWidget->setCurrentIndex(IDX_AUTH); }
+void MainWindow::onBackToAuth()    { stackedWidget->setCurrentIndex(IDX_AUTH); }
+
+void MainWindow::onRegistrationSuccess(const QString &login)
+{
+    graphWidget->setUserLogin(login);
+    graphWidget->updateGraph();
+    stackedWidget->setCurrentIndex(IDX_GRAPH);
+}
+
+void MainWindow::onLogout()        { stackedWidget->setCurrentIndex(IDX_AUTH); }
+void MainWindow::onResetSuccess()  { stackedWidget->setCurrentIndex(IDX_AUTH); }
 
 void MainWindow::onTaskBtnClicked()  { TaskDialog   dlg(this); dlg.exec(); }
 void MainWindow::onSchemaBtnClicked(){ SchemaDialog dlg(this); dlg.exec(); }

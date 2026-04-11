@@ -16,6 +16,9 @@ if [ -f "$DAEMON_JSON" ]; then
     [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
 fi
 
+echo "[*] Creating /etc/docker/ directory if missing..."
+sudo mkdir -p /etc/docker
+
 echo "[*] Writing DNS config to $DAEMON_JSON..."
 sudo tee "$DAEMON_JSON" > /dev/null <<'EOF'
 {

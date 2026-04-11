@@ -124,23 +124,29 @@ chmod +x docker/fix-dns.sh
 
 1. Зарегистрируйтесь на [hub.docker.com](https://hub.docker.com) (если нет аккаунта)
 2. Войдите в Docker из терминала:
-   ```bash
-   docker login
-   ```
+```bash
+docker login
+```
 3. Пересоберите образ с тегом вашего логина:
-   ```bash
-   docker build -f docker/Dockerfile -t <ваш_логин>/timp-server:latest .
-   ```
+```bash
+docker build -f docker/Dockerfile -t <ваш_логин>/timp-server:latest .
+```
 4. Запушьте образ:
-   ```bash
-   docker push <ваш_логин>/timp-server:latest
-   ```
+```bash
+docker push <ваш_логин>/timp-server:latest
+```
 5. После этого образ будет доступен по адресу `hub.docker.com/<ваш_логин>/timp-server`.
-   Скачать и запустить на любой машине:
-   ```bash
-   docker pull <ваш_логин>/timp-server:latest
-   docker run -d --name timp-server -p 33333:33333 <ваш_логин>/timp-server:latest
-   ```
+Скачать и запустить на любой машине:
+```bash
+docker pull <ваш_логин>/timp-server:latest
+docker run -d --name timp-server -p 33333:33333 <ваш_логин>/timp-server:latest
+```
+## На данный момент актуальная комманда для запуска:
+
+```bash
+docker pull rainkord/timp-server:latest
+docker run -d --name timp-server -p 33333:33333 rainkord/timp-server:latest
+```
 
 ---
 
@@ -174,13 +180,6 @@ sudo pacman -S doxygen graphviz
 
 ```bash
 doxygen docs/Doxyfile && xdg-open docs/output/html/index.html
-```
-
-## На данный момент актуальная команда для запуска:
-
-```bash
-docker pull rainkord/timp-server:latest
-docker run -d --name timp-server -p 33333:33333 rainkord/timp-server:latest
 ```
 
 ---

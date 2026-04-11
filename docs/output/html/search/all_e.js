@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['registrationsuccess_0',['registrationSuccess',['../classRegWidget.html#af16d9c3288f5c904c21298cc082b8fef',1,'RegWidget']]],
+  ['registrationsuccess_0',['registrationSuccess',['../classRegWidget.html#a79e2d43c1747d252254fc8f0016d320e',1,'RegWidget']]],
   ['regwidget_1',['RegWidget',['../classRegWidget.html',1,'RegWidget'],['../classRegWidget.html#a8c42413d99d1f7fd0f192247c635e7c0',1,'RegWidget::RegWidget()']]],
   ['regwidget_2ecpp_2',['regwidget.cpp',['../regwidget_8cpp.html',1,'']]],
   ['regwidget_2eh_3',['regwidget.h',['../regwidget_8h.html',1,'']]],

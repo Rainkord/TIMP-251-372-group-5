@@ -14,6 +14,7 @@ var annotated_dup =
     [ "qt_meta_stringdata_FlowchartWidget_t", "structqt__meta__stringdata__FlowchartWidget__t.html", "structqt__meta__stringdata__FlowchartWidget__t" ],
     [ "qt_meta_stringdata_GraphWidget_t", "structqt__meta__stringdata__GraphWidget__t.html", "structqt__meta__stringdata__GraphWidget__t" ],
     [ "qt_meta_stringdata_MainWindow_t", "structqt__meta__stringdata__MainWindow__t.html", "structqt__meta__stringdata__MainWindow__t" ],
+    [ "qt_meta_stringdata_MyTcpServer_t", "structqt__meta__stringdata__MyTcpServer__t.html", "structqt__meta__stringdata__MyTcpServer__t" ],
     [ "qt_meta_stringdata_RegWidget_t", "structqt__meta__stringdata__RegWidget__t.html", "structqt__meta__stringdata__RegWidget__t" ],
     [ "qt_meta_stringdata_ResetWidget_t", "structqt__meta__stringdata__ResetWidget__t.html", "structqt__meta__stringdata__ResetWidget__t" ],
     [ "qt_meta_stringdata_SchemaDialog_t", "structqt__meta__stringdata__SchemaDialog__t.html", "structqt__meta__stringdata__SchemaDialog__t" ],

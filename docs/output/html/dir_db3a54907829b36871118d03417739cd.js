@@ -13,7 +13,7 @@ var dir_db3a54907829b36871118d03417739cd =
     [ "moc_clientsingleton.cpp", "moc__clientsingleton_8cpp.html", "moc__clientsingleton_8cpp" ],
     [ "moc_graphwidget.cpp", "moc__graphwidget_8cpp.html", "moc__graphwidget_8cpp" ],
     [ "moc_mainwindow.cpp", "moc__mainwindow_8cpp.html", "moc__mainwindow_8cpp" ],
-    [ "moc_predefs.h", "moc__predefs_8h.html", "moc__predefs_8h" ],
+    [ "moc_predefs.h", "client_2moc__predefs_8h.html", "client_2moc__predefs_8h" ],
     [ "moc_regwidget.cpp", "moc__regwidget_8cpp.html", "moc__regwidget_8cpp" ],
     [ "moc_resetwidget.cpp", "moc__resetwidget_8cpp.html", "moc__resetwidget_8cpp" ],
     [ "moc_schemadialog.cpp", "moc__schemadialog_8cpp.html", "moc__schemadialog_8cpp" ],

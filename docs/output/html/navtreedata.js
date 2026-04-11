@@ -49,9 +49,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"moc__predefs_8h.html#a1b27e3508a4c1e97875297882a95f503",
-"moc__predefs_8h.html#aa20ffd72afade34f989f1f18f1f66673",
-"schemadialog_8cpp.html#ad67e2a119264c3ac8aa7023fba3f30d1"
+"client_2moc__predefs_8h.html#a5436993e3c0ddb7caee4b9b01021cde4",
+"client_2moc__predefs_8h.html#ad3062ff83239e8dd2b8969a2f368d608",
+"schemadialog_8cpp.html#aaee6164fa4c164ac1bd7f6ca3d526748",
+"server_2moc__predefs_8h.html#a79e289c54a8c9851b2b118d442bbc26c",
+"structqt__meta__stringdata__ClientSingleton__t.html"
 ];
 
 var SYNCONMSG = 'нажмите на выключить для синхронизации панелей';

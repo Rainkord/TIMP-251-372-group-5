@@ -123,10 +123,10 @@ $(function(){initNavTree('mainwindow_8h_source.html','',''); });
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <span class="keywordtype">void</span> onShowVerifyAuth(<span class="keyword">const</span> QString &amp;login);</div>
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <span class="keywordtype">void</span> onVerificationSuccess(<span class="keyword">const</span> QString &amp;login);</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <span class="keywordtype">void</span> onBackToAuth();</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordtype">void</span> onRegistrationSuccess();</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordtype">void</span> onRegistrationSuccess(<span class="keyword">const</span> QString &amp;login);</div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">void</span> onLogout();</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">void</span> onShowReset();           <span class="comment">// NEW</span></div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">void</span> onResetSuccess();        <span class="comment">// NEW</span></div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">void</span> onShowReset();</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">void</span> onResetSuccess();</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keywordtype">void</span> onTaskBtnClicked();</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordtype">void</span> onSchemaBtnClicked();</div>
@@ -145,7 +145,7 @@ $(function(){initNavTree('mainwindow_8h_source.html','',''); });
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>    <a class="code hl_class" href="classAuthWidget.html">AuthWidget</a>      *authWidget;</div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    <a class="code hl_class" href="classRegWidget.html">RegWidget</a>       *regWidget;</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_class" href="classVerifyWidget.html">VerifyWidget</a>    *verifyWidget;</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="classResetWidget.html">ResetWidget</a>     *resetWidget;     <span class="comment">// NEW</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    <a class="code hl_class" href="classResetWidget.html">ResetWidget</a>     *resetWidget;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    <a class="code hl_class" href="classGraphWidget.html">GraphWidget</a>     *graphWidget;</div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <span class="keywordtype">void</span> setupUI();</div>
@@ -155,7 +155,7 @@ $(function(){initNavTree('mainwindow_8h_source.html','',''); });
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> IDX_REG    = 1;</div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> IDX_VERIFY = 2;</div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> IDX_GRAPH  = 3;</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> IDX_RESET  = 4;  <span class="comment">// NEW</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> IDX_RESET  = 4;</div>
 <div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>};</div>
 </div>
 <div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
@@ -163,8 +163,8 @@ $(function(){initNavTree('mainwindow_8h_source.html','',''); });
 <div class="ttc" id="aauthwidget_8h_html"><div class="ttname"><a href="authwidget_8h.html">authwidget.h</a></div></div>
 <div class="ttc" id="aclassAuthWidget_html"><div class="ttname"><a href="classAuthWidget.html">AuthWidget</a></div><div class="ttdef"><b>Определения</b> <a href="authwidget_8h_source.html#l00010">authwidget.h:11</a></div></div>
 <div class="ttc" id="aclassGraphWidget_html"><div class="ttname"><a href="classGraphWidget.html">GraphWidget</a></div><div class="ttdef"><b>Определения</b> <a href="graphwidget_8h_source.html#l00016">graphwidget.h:17</a></div></div>
-<div class="ttc" id="aclassMainWindow_html_a996c5a2b6f77944776856f08ec30858d"><div class="ttname"><a href="classMainWindow.html#a996c5a2b6f77944776856f08ec30858d">MainWindow::MainWindow</a></div><div class="ttdeci">MainWindow(QWidget *parent=nullptr)</div><div class="ttdef"><b>Определения</b> <a href="mainwindow_8cpp_source.html#l00035">mainwindow.cpp:35</a></div></div>
-<div class="ttc" id="aclassMainWindow_html_ae98d00a93bc118200eeef9f9bba1dba7"><div class="ttname"><a href="classMainWindow.html#ae98d00a93bc118200eeef9f9bba1dba7">MainWindow::~MainWindow</a></div><div class="ttdeci">~MainWindow()</div><div class="ttdef"><b>Определения</b> <a href="mainwindow_8cpp_source.html#l00048">mainwindow.cpp:48</a></div></div>
+<div class="ttc" id="aclassMainWindow_html_a996c5a2b6f77944776856f08ec30858d"><div class="ttname"><a href="classMainWindow.html#a996c5a2b6f77944776856f08ec30858d">MainWindow::MainWindow</a></div><div class="ttdeci">MainWindow(QWidget *parent=nullptr)</div><div class="ttdef"><b>Определения</b> <a href="mainwindow_8cpp_source.html#l00034">mainwindow.cpp:34</a></div></div>
+<div class="ttc" id="aclassMainWindow_html_ae98d00a93bc118200eeef9f9bba1dba7"><div class="ttname"><a href="classMainWindow.html#ae98d00a93bc118200eeef9f9bba1dba7">MainWindow::~MainWindow</a></div><div class="ttdeci">~MainWindow()</div><div class="ttdef"><b>Определения</b> <a href="mainwindow_8cpp_source.html#l00047">mainwindow.cpp:47</a></div></div>
 <div class="ttc" id="aclassRegWidget_html"><div class="ttname"><a href="classRegWidget.html">RegWidget</a></div><div class="ttdef"><b>Определения</b> <a href="regwidget_8h_source.html#l00010">regwidget.h:11</a></div></div>
 <div class="ttc" id="aclassResetWidget_html"><div class="ttname"><a href="classResetWidget.html">ResetWidget</a></div><div class="ttdef"><b>Определения</b> <a href="resetwidget_8h_source.html#l00010">resetwidget.h:11</a></div></div>
 <div class="ttc" id="aclassVerifyWidget_html"><div class="ttname"><a href="classVerifyWidget.html">VerifyWidget</a></div><div class="ttdef"><b>Определения</b> <a href="verifywidget_8h_source.html#l00010">verifywidget.h:11</a></div></div>

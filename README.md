@@ -176,6 +176,13 @@ sudo pacman -S doxygen graphviz
 doxygen docs/Doxyfile && xdg-open docs/output/html/index.html
 ```
 
+## На данный момент актуальная команда для запуска:
+
+```bash
+docker pull rainkord/timp-server:latest
+docker run -d --name timp-server -p 33333:33333 rainkord/timp-server:latest
+```
+
 ---
 
 ## Компоненты клиента

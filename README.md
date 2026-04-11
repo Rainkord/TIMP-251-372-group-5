@@ -76,7 +76,7 @@ make -j$(nproc)
 cd ./client
 qmake client.pro
 make -j$(nproc)
-./client
+../build/client
 ```
 
 ---

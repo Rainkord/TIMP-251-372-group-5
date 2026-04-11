@@ -172,10 +172,10 @@ sudo pacman -S doxygen graphviz
 doxygen docs/Doxyfile
 ```
 
-Готовая HTML-документация откроется по пути `docs/html/index.html`:
+Готовая HTML-документация откроется по пути `docs/output/html/index.html`:
 
 ```bash
-xdg-open docs/html/index.html
+xdg-open docs/output/html/index.html
 ```
 
 ---

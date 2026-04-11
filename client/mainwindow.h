@@ -28,10 +28,10 @@ private slots:
     void onShowVerifyAuth(const QString &login);
     void onVerificationSuccess(const QString &login);
     void onBackToAuth();
-    void onRegistrationSuccess();
+    void onRegistrationSuccess(const QString &login);
     void onLogout();
-    void onShowReset();           // NEW
-    void onResetSuccess();        // NEW
+    void onShowReset();
+    void onResetSuccess();
 
     void onTaskBtnClicked();
     void onSchemaBtnClicked();
@@ -50,7 +50,7 @@ private:
     AuthWidget      *authWidget;
     RegWidget       *regWidget;
     VerifyWidget    *verifyWidget;
-    ResetWidget     *resetWidget;     // NEW
+    ResetWidget     *resetWidget;
     GraphWidget     *graphWidget;
 
     void setupUI();
@@ -60,7 +60,7 @@ private:
     static const int IDX_REG    = 1;
     static const int IDX_VERIFY = 2;
     static const int IDX_GRAPH  = 3;
-    static const int IDX_RESET  = 4;  // NEW
+    static const int IDX_RESET  = 4;
 };
 
 #endif // MAINWINDOW_H

@@ -152,6 +152,10 @@ cd tests
 qmake tests.pro
 make
 ./tests
+
+cd tests                          
+g++ -o test_calculator test_calculator.cpp -std=c++11
+./test_calculator
 ```
 
 ---

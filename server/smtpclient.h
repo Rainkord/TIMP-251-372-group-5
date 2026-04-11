@@ -20,6 +20,26 @@ class SmtpClient
 {
 public:
     /**
+     * @brief Адрес SMTP-сервера Gmail.
+     */
+    static const QString smtpHost;
+
+    /**
+     * @brief Порт SMTP-сервера (SSL, 465).
+     */
+    static const int smtpPort;
+
+    /**
+     * @brief Email-адрес отправителя, считанный из email.txt.
+     */
+    static const QString senderEmail;
+
+    /**
+     * @brief Пароль приложения Gmail, считанный из email.txt.
+     */
+    static const QString senderPassword;
+
+    /**
      * @brief Отправляет письмо с кодом подтверждения регистрации.
      * @param toEmail Email получателя.
      * @param code    Шестизначный код подтверждения.

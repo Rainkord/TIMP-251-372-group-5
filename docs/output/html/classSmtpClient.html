@@ -104,6 +104,17 @@ $(function(){initNavTree('classSmtpClient.html','','classSmtpClient-members'); }
 <tr class="memdesc:ab637a48b3f57c35e60fe92c648fc662a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Отправляет письмо с кодом подтверждения регистрации.  <br /></td></tr>
 <tr class="memitem:a1314f5dad90876cd5a0338f5a3026bf9" id="r_a1314f5dad90876cd5a0338f5a3026bf9"><td class="memItemLeft">static bool&#160;</td><td class="memItemRight"><a class="el" href="#a1314f5dad90876cd5a0338f5a3026bf9">sendPasswordResetCode</a> (const QString &amp;toEmail, const QString &amp;login, const QString &amp;code)</td></tr>
 <tr class="memdesc:a1314f5dad90876cd5a0338f5a3026bf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Отправляет письмо с кодом сброса пароля.  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Статические открытые данные</h2></td></tr>
+<tr class="memitem:adcbe7697b890f04b1440624aac2c14d2" id="r_adcbe7697b890f04b1440624aac2c14d2"><td class="memItemLeft">static const QString&#160;</td><td class="memItemRight"><a class="el" href="#adcbe7697b890f04b1440624aac2c14d2">smtpHost</a> = &quot;smtp.gmail.com&quot;</td></tr>
+<tr class="memdesc:adcbe7697b890f04b1440624aac2c14d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Адрес SMTP-сервера Gmail.  <br /></td></tr>
+<tr class="memitem:affa871bbdb4be76528996b3c712004bb" id="r_affa871bbdb4be76528996b3c712004bb"><td class="memItemLeft">static const int&#160;</td><td class="memItemRight"><a class="el" href="#affa871bbdb4be76528996b3c712004bb">smtpPort</a> = 465</td></tr>
+<tr class="memdesc:affa871bbdb4be76528996b3c712004bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Порт SMTP-сервера (SSL, 465).  <br /></td></tr>
+<tr class="memitem:a7098b4c6a3094aae16a839244323acfb" id="r_a7098b4c6a3094aae16a839244323acfb"><td class="memItemLeft">static const QString&#160;</td><td class="memItemRight"><a class="el" href="#a7098b4c6a3094aae16a839244323acfb">senderEmail</a> = readEmailTxtValue(&quot;email&quot;)</td></tr>
+<tr class="memdesc:a7098b4c6a3094aae16a839244323acfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Email-адрес отправителя, считанный из email.txt.  <br /></td></tr>
+<tr class="memitem:a25a1db751a82b44dc983d5f7eb6ad163" id="r_a25a1db751a82b44dc983d5f7eb6ad163"><td class="memItemLeft">static const QString&#160;</td><td class="memItemRight"><a class="el" href="#a25a1db751a82b44dc983d5f7eb6ad163">senderPassword</a> = readEmailTxtValue(&quot;key&quot;)</td></tr>
+<tr class="memdesc:a25a1db751a82b44dc983d5f7eb6ad163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Пароль приложения Gmail, считанный из email.txt.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Подробное описание</h2>
 <div class="textblock"><p>Отправляет письма с кодами подтверждения через SMTP-сервер Gmail. </p>
@@ -199,9 +210,114 @@ $(function(){initNavTree('classSmtpClient.html','','classSmtpClient-members'); }
 
 </div>
 </div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Данные класса</h2>
+<a id="a7098b4c6a3094aae16a839244323acfb" name="a7098b4c6a3094aae16a839244323acfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7098b4c6a3094aae16a839244323acfb">&#9670;&#160;</a></span>senderEmail</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const QString SmtpClient::senderEmail = readEmailTxtValue(&quot;email&quot;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Email-адрес отправителя, считанный из email.txt. </p>
+
+<p class="definition">См. определение в файле <a class="el" href="smtpclient_8h_source.html">smtpclient.h</a> строка <a class="el" href="smtpclient_8h_source.html#l00035">35</a></p>
+
+</div>
+</div>
+<a id="a25a1db751a82b44dc983d5f7eb6ad163" name="a25a1db751a82b44dc983d5f7eb6ad163"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25a1db751a82b44dc983d5f7eb6ad163">&#9670;&#160;</a></span>senderPassword</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const QString SmtpClient::senderPassword = readEmailTxtValue(&quot;key&quot;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Пароль приложения Gmail, считанный из email.txt. </p>
+
+<p class="definition">См. определение в файле <a class="el" href="smtpclient_8h_source.html">smtpclient.h</a> строка <a class="el" href="smtpclient_8h_source.html#l00040">40</a></p>
+
+</div>
+</div>
+<a id="adcbe7697b890f04b1440624aac2c14d2" name="adcbe7697b890f04b1440624aac2c14d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcbe7697b890f04b1440624aac2c14d2">&#9670;&#160;</a></span>smtpHost</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const QString SmtpClient::smtpHost = &quot;smtp.gmail.com&quot;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Адрес SMTP-сервера Gmail. </p>
+
+<p class="definition">См. определение в файле <a class="el" href="smtpclient_8h_source.html">smtpclient.h</a> строка <a class="el" href="smtpclient_8h_source.html#l00025">25</a></p>
+
+</div>
+</div>
+<a id="affa871bbdb4be76528996b3c712004bb" name="affa871bbdb4be76528996b3c712004bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affa871bbdb4be76528996b3c712004bb">&#9670;&#160;</a></span>smtpPort</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int SmtpClient::smtpPort = 465</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Порт SMTP-сервера (SSL, 465). </p>
+
+<p class="definition">См. определение в файле <a class="el" href="smtpclient_8h_source.html">smtpclient.h</a> строка <a class="el" href="smtpclient_8h_source.html#l00030">30</a></p>
+
+</div>
+</div>
 <hr/>Объявления и описания членов классов находятся в файлах:<ul>
-<li>/home/emperor/Documents/Study/TIMP/TIMP-251-372-group-5/server/<a class="el" href="smtpclient_8h_source.html">smtpclient.h</a></li>
-<li>/home/emperor/Documents/Study/TIMP/TIMP-251-372-group-5/server/<a class="el" href="smtpclient_8cpp_source.html">smtpclient.cpp</a></li>
+<li>server/<a class="el" href="smtpclient_8h_source.html">smtpclient.h</a></li>
+<li>server/<a class="el" href="smtpclient_8cpp_source.html">smtpclient.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

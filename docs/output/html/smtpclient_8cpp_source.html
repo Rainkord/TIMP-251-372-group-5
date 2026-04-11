@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.16.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ТМП Подгруппа 5 — Функция 9: Исходный файл /home/emperor/Documents/Study/TIMP/TIMP-251-372-group-5/server/smtpclient.cpp</title>
+<title>ТМП Подгруппа 5 — Функция 9: Исходный файл server/smtpclient.cpp</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -102,8 +102,8 @@ $(function(){initNavTree('smtpclient_8cpp_source.html','',''); });
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;QCoreApplication&gt;</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;QDir&gt;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">const</span> QString SmtpClient::smtpHost = <span class="stringliteral">&quot;smtp.gmail.com&quot;</span>;</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">const</span> <span class="keywordtype">int</span>     SmtpClient::smtpPort = 465;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">const</span> QString <a class="code hl_variable" href="classSmtpClient.html#adcbe7697b890f04b1440624aac2c14d2">SmtpClient::smtpHost</a> = <span class="stringliteral">&quot;smtp.gmail.com&quot;</span>;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">const</span> <span class="keywordtype">int</span>     <a class="code hl_variable" href="classSmtpClient.html#affa871bbdb4be76528996b3c712004bb">SmtpClient::smtpPort</a> = 465;</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">// ── Read email.txt next to the server executable ────────────────────────────</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">// Format:</span></div>
@@ -141,8 +141,8 @@ $(function(){initNavTree('smtpclient_8cpp_source.html','',''); });
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>    <span class="keywordflow">return</span> {};</div>
 <div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>}</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keyword">const</span> QString SmtpClient::senderEmail    = readEmailTxtValue(<span class="stringliteral">&quot;email&quot;</span>);</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keyword">const</span> QString SmtpClient::senderPassword = readEmailTxtValue(<span class="stringliteral">&quot;key&quot;</span>);</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="keyword">const</span> QString <a class="code hl_variable" href="classSmtpClient.html#a7098b4c6a3094aae16a839244323acfb">SmtpClient::senderEmail</a>    = readEmailTxtValue(<span class="stringliteral">&quot;email&quot;</span>);</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keyword">const</span> QString <a class="code hl_variable" href="classSmtpClient.html#a25a1db751a82b44dc983d5f7eb6ad163">SmtpClient::senderPassword</a> = readEmailTxtValue(<span class="stringliteral">&quot;key&quot;</span>);</div>
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment">// ────────────────────────────────────────────────────────────────────────────</span></div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
@@ -187,7 +187,7 @@ $(function(){initNavTree('smtpclient_8cpp_source.html','',''); });
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>                   <span class="keyword">const</span> QString &amp;bodyText)</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>{</div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    QSslSocket socket;</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    socket.connectToHostEncrypted(SmtpClient::smtpHost, SmtpClient::smtpPort);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    socket.connectToHostEncrypted(<a class="code hl_variable" href="classSmtpClient.html#adcbe7697b890f04b1440624aac2c14d2">SmtpClient::smtpHost</a>, <a class="code hl_variable" href="classSmtpClient.html#affa871bbdb4be76528996b3c712004bb">SmtpClient::smtpPort</a>);</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    socket.ignoreSslErrors();</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordflow">if</span> (!socket.waitForEncrypted(20000)) {</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        qDebug() &lt;&lt; <span class="stringliteral">&quot;[SMTP] SSL connection failed:&quot;</span> &lt;&lt; socket.errorString();</div>
@@ -204,14 +204,14 @@ $(function(){initNavTree('smtpclient_8cpp_source.html','',''); });
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    resp = sendCmd(&amp;socket, <span class="stringliteral">&quot;AUTH LOGIN\r\n&quot;</span>);</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    <span class="keywordflow">if</span> (!resp.startsWith(<span class="stringliteral">&quot;334&quot;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    resp = sendCmd(&amp;socket, SmtpClient::senderEmail.toUtf8().toBase64() + <span class="stringliteral">&quot;\r\n&quot;</span>);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    resp = sendCmd(&amp;socket, <a class="code hl_variable" href="classSmtpClient.html#a7098b4c6a3094aae16a839244323acfb">SmtpClient::senderEmail</a>.toUtf8().toBase64() + <span class="stringliteral">&quot;\r\n&quot;</span>);</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordflow">if</span> (!resp.startsWith(<span class="stringliteral">&quot;334&quot;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    resp = sendCmd(&amp;socket, SmtpClient::senderPassword.toUtf8().toBase64() + <span class="stringliteral">&quot;\r\n&quot;</span>);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    resp = sendCmd(&amp;socket, <a class="code hl_variable" href="classSmtpClient.html#a25a1db751a82b44dc983d5f7eb6ad163">SmtpClient::senderPassword</a>.toUtf8().toBase64() + <span class="stringliteral">&quot;\r\n&quot;</span>);</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordflow">if</span> (!resp.startsWith(<span class="stringliteral">&quot;235&quot;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    qDebug() &lt;&lt; <span class="stringliteral">&quot;[SMTP] Authenticated&quot;</span>;</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    resp = sendCmd(&amp;socket, <span class="stringliteral">&quot;MAIL FROM:&lt;&quot;</span> + SmtpClient::senderEmail.toUtf8() + <span class="stringliteral">&quot;&gt;\r\n&quot;</span>);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    resp = sendCmd(&amp;socket, <span class="stringliteral">&quot;MAIL FROM:&lt;&quot;</span> + <a class="code hl_variable" href="classSmtpClient.html#a7098b4c6a3094aae16a839244323acfb">SmtpClient::senderEmail</a>.toUtf8() + <span class="stringliteral">&quot;&gt;\r\n&quot;</span>);</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <span class="keywordflow">if</span> (!resp.startsWith(<span class="stringliteral">&quot;250&quot;</span>)) <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span> </div>
 <div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    resp = sendCmd(&amp;socket, <span class="stringliteral">&quot;RCPT TO:&lt;&quot;</span> + toEmail.toUtf8() + <span class="stringliteral">&quot;&gt;\r\n&quot;</span>);</div>
@@ -224,7 +224,7 @@ $(function(){initNavTree('smtpclient_8cpp_source.html','',''); });
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    QByteArray email;</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    email += <span class="stringliteral">&quot;Subject: =?UTF-8?B?&quot;</span> + subjectB64 + <span class="stringliteral">&quot;?=\r\n&quot;</span>;</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    email += <span class="stringliteral">&quot;From: &quot;</span> + SmtpClient::senderEmail.toUtf8() + <span class="stringliteral">&quot;\r\n&quot;</span>;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    email += <span class="stringliteral">&quot;From: &quot;</span> + <a class="code hl_variable" href="classSmtpClient.html#a7098b4c6a3094aae16a839244323acfb">SmtpClient::senderEmail</a>.toUtf8() + <span class="stringliteral">&quot;\r\n&quot;</span>;</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    email += <span class="stringliteral">&quot;To: &quot;</span> + toEmail.toUtf8() + <span class="stringliteral">&quot;\r\n&quot;</span>;</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    email += <span class="stringliteral">&quot;Content-Type: text/plain; charset=UTF-8\r\n&quot;</span>;</div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    email += <span class="stringliteral">&quot;\r\n&quot;</span>;</div>
@@ -271,7 +271,11 @@ $(function(){initNavTree('smtpclient_8cpp_source.html','',''); });
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>}</div>
 </div>
 <div class="ttc" id="aclassSmtpClient_html_a1314f5dad90876cd5a0338f5a3026bf9"><div class="ttname"><a href="classSmtpClient.html#a1314f5dad90876cd5a0338f5a3026bf9">SmtpClient::sendPasswordResetCode</a></div><div class="ttdeci">static bool sendPasswordResetCode(const QString &amp;toEmail, const QString &amp;login, const QString &amp;code)</div><div class="ttdoc">Отправляет письмо с кодом сброса пароля.</div><div class="ttdef"><b>Определения</b> <a href="#l00165">smtpclient.cpp:165</a></div></div>
+<div class="ttc" id="aclassSmtpClient_html_a25a1db751a82b44dc983d5f7eb6ad163"><div class="ttname"><a href="classSmtpClient.html#a25a1db751a82b44dc983d5f7eb6ad163">SmtpClient::senderPassword</a></div><div class="ttdeci">static const QString senderPassword</div><div class="ttdoc">Пароль приложения Gmail, считанный из email.txt.</div><div class="ttdef"><b>Определения</b> <a href="smtpclient_8h_source.html#l00040">smtpclient.h:40</a></div></div>
+<div class="ttc" id="aclassSmtpClient_html_a7098b4c6a3094aae16a839244323acfb"><div class="ttname"><a href="classSmtpClient.html#a7098b4c6a3094aae16a839244323acfb">SmtpClient::senderEmail</a></div><div class="ttdeci">static const QString senderEmail</div><div class="ttdoc">Email-адрес отправителя, считанный из email.txt.</div><div class="ttdef"><b>Определения</b> <a href="smtpclient_8h_source.html#l00035">smtpclient.h:35</a></div></div>
 <div class="ttc" id="aclassSmtpClient_html_ab637a48b3f57c35e60fe92c648fc662a"><div class="ttname"><a href="classSmtpClient.html#ab637a48b3f57c35e60fe92c648fc662a">SmtpClient::sendVerificationCode</a></div><div class="ttdeci">static bool sendVerificationCode(const QString &amp;toEmail, const QString &amp;code)</div><div class="ttdoc">Отправляет письмо с кодом подтверждения регистрации.</div><div class="ttdef"><b>Определения</b> <a href="#l00158">smtpclient.cpp:158</a></div></div>
+<div class="ttc" id="aclassSmtpClient_html_adcbe7697b890f04b1440624aac2c14d2"><div class="ttname"><a href="classSmtpClient.html#adcbe7697b890f04b1440624aac2c14d2">SmtpClient::smtpHost</a></div><div class="ttdeci">static const QString smtpHost</div><div class="ttdoc">Адрес SMTP-сервера Gmail.</div><div class="ttdef"><b>Определения</b> <a href="smtpclient_8h_source.html#l00025">smtpclient.h:25</a></div></div>
+<div class="ttc" id="aclassSmtpClient_html_affa871bbdb4be76528996b3c712004bb"><div class="ttname"><a href="classSmtpClient.html#affa871bbdb4be76528996b3c712004bb">SmtpClient::smtpPort</a></div><div class="ttdeci">static const int smtpPort</div><div class="ttdoc">Порт SMTP-сервера (SSL, 465).</div><div class="ttdef"><b>Определения</b> <a href="smtpclient_8h_source.html#l00030">smtpclient.h:30</a></div></div>
 <div class="ttc" id="asmtpclient_8h_html"><div class="ttname"><a href="smtpclient_8h.html">smtpclient.h</a></div><div class="ttdoc">Утилитный класс для отправки email через SMTP (Gmail).</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

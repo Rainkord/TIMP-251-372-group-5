@@ -79,6 +79,7 @@ var menudata={children:[
 {text:"l",url:"globals_l.html#index_l"},
 {text:"m",url:"globals_m.html#index_m"},
 {text:"q",url:"globals_q.html#index_q"},
+{text:"s",url:"globals_s.html#index_s"},
 {text:"u",url:"globals_u.html#index_u"}]},
 {text:"Функции",url:"globals_func.html"},
 {text:"Макросы",url:"globals_defs.html",children:[
@@ -89,4 +90,5 @@ var menudata={children:[
 {text:"g",url:"globals_defs_g.html#index_g"},
 {text:"l",url:"globals_defs_l.html#index_l"},
 {text:"q",url:"globals_defs_q.html#index_q"},
+{text:"s",url:"globals_defs_s.html#index_s"},
 {text:"u",url:"globals_defs_u.html#index_u"}]}]}]}]}

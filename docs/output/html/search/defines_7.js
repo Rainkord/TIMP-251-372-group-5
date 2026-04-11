@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['unix_0',['unix',['../moc__predefs_8h.html#a4e65214f450ef6326b96b52e6dd5714b',1,'moc_predefs.h']]]
+  ['server_5fport_0',['SERVER_PORT',['../mytcpserver_8cpp.html#ac42367fe5c999ec6650de83e9d72fe8c',1,'mytcpserver.cpp']]]
 ];

@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"moc__predefs_8h.html#aa20ffd72afade34f989f1f18f1f66673":[1,0,0,13,143],
+"moc__predefs_8h.html#aa26975016847959a13829cb568b126b3":[1,0,0,13,244],
 "moc__predefs_8h.html#aa2fbfcb03f8deb89dc6122923d47bc76":[1,0,0,13,194],
 "moc__predefs_8h.html#aa39266a3f430ebcd4a4374e7a815e23f":[1,0,0,13,381],
 "moc__predefs_8h.html#aa3f186f612efe5edfcc371c95617f06f":[1,0,0,13,296],
@@ -179,6 +181,7 @@ var NAVTREEINDEX2 =
 "moc__verifywidget_8cpp.html#a75bb9482d242cde0a06c9dbdc6b83abe":[1,0,0,18,1],
 "moc__verifywidget_8cpp_source.html":[1,0,0,18],
 "mytcpserver_8cpp.html":[1,0,1,7],
+"mytcpserver_8cpp.html#ac42367fe5c999ec6650de83e9d72fe8c":[1,0,1,7,0],
 "mytcpserver_8cpp_source.html":[1,0,1,7],
 "mytcpserver_8h.html":[1,0,1,8],
 "mytcpserver_8h_source.html":[1,0,1,8],
@@ -246,8 +249,5 @@ var NAVTREEINDEX2 =
 "schemadialog_8cpp.html#a8d6f67ec0e17f20fe965ef3dc4386ca0":[1,0,0,23,5],
 "schemadialog_8cpp.html#aaee6164fa4c164ac1bd7f6ca3d526748":[1,0,0,23,9],
 "schemadialog_8cpp.html#ac71712f256420c526d5febd11576d278":[1,0,0,23,13],
-"schemadialog_8cpp.html#ac92ae50bc8e596177fd389d04cde4938":[1,0,0,23,18],
-"schemadialog_8cpp.html#ad67e2a119264c3ac8aa7023fba3f30d1":[1,0,0,23,16],
-"schemadialog_8cpp_source.html":[1,0,0,23],
-"schemadialog_8h.html":[1,0,0,24]
+"schemadialog_8cpp.html#ac92ae50bc8e596177fd389d04cde4938":[1,0,0,23,18]
 };
